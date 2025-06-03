@@ -1,7 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { RealtimeAgent, RealtimeSession, tool } from "@openai/agents/realtime";
+import {
+  RealtimeAgent,
+  RealtimeItem,
+  RealtimeSession,
+  tool,
+} from "@openai/agents/realtime";
 import { getSessionToken } from "./server/token";
 import z from "zod";
 
@@ -16,16 +21,24 @@ const getWeather = tool({
   },
 });
 
+const weatherAgent = new RealtimeAgent({
+  name: "Weather Agent",
+  instructions: "Talk with a New York accent",
+  handoffDescription: "This agent is an expert in weather",
+  tools: [getWeather],
+});
+
 const agent = new RealtimeAgent({
   name: "Voice Agent",
   instructions:
     "You are a voice agent that can answer questions and help with tasks.",
-  tools: [getWeather],
+  handoffs: [weatherAgent],
 });
 
 export default function Home() {
   const session = useRef<RealtimeSession | null>(null);
   const [connected, setConnected] = useState(false);
+  const [history, setHistory] = useState<RealtimeItem[]>([]);
 
   async function onConnect() {
     if (connected) {
@@ -39,9 +52,16 @@ export default function Home() {
       session.current.on("transport_event", (event) => {
         console.log(event);
       });
-      // session.current.on("history_updated", (history) => {
-      //   console.log(history);
-      // });
+      session.current.on("history_updated", (history) => {
+        setHistory(history);
+      });
+      session.current.on(
+        "tool_approval_requested",
+        async (context, agent, approvalRequest) => {
+          const response = prompt("Approve or deny the tool call?");
+          session.current?.approve(approvalRequest.approvalItem);
+        }
+      );
       await session.current.connect({
         apiKey: token,
       });
@@ -58,6 +78,15 @@ export default function Home() {
       >
         {connected ? "Disconnect" : "Connect"}
       </button>
+      <ul>
+        {history
+          .filter((item) => item.type === "message")
+          .map((item) => (
+            <li key={item.itemId}>
+              {item.role}: {JSON.stringify(item.content)}
+            </li>
+          ))}
+      </ul>
     </div>
   );
 }
