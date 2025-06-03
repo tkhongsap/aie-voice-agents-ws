@@ -47,3 +47,11 @@ The following command will start up the development server for your Next.js app:
 ```bash
 npm --prefix 02-voice run dev
 ```
+
+## Resources
+
+- [Agents SDK Quickstart](https://openai.github.io/openai-agents-js/guides/quickstart)
+- [Agents SDK Voice Quickstart](https://openai.github.io/openai-agents-js/guides/voice-agents/quickstart/)
+- [Agents SDK Examples](https://github.com/openai/openai-agents-js-internal/tree/main/examples)
+- [Details about Voice Agent Features](https://openai.github.io/openai-gents-js/guides/voice-agents/build/)
+- [Voice Agents Guide on the OpenAI Docs](https://platform.openai.com/docs/guides/voice-agents)
