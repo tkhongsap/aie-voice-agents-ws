@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "scripts": {
+    "install": "npm install --prefix 01-basic && npm install --prefix 02-voice"
+  }
+}
