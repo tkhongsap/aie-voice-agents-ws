@@ -37,7 +37,7 @@ Afterwards we will use the Next.js app in [02-voice](02-voice/) to build our voi
 The following command will execute your `index.ts` file:
 
 ```bash
-npm --prefix 01-basic start
+npm run start:01
 ```
 
 ### 02-voice
@@ -45,7 +45,7 @@ npm --prefix 01-basic start
 The following command will start up the development server for your Next.js app:
 
 ```bash
-npm --prefix 02-voice run dev
+npm run start:02
 ```
 
 ## Resources
