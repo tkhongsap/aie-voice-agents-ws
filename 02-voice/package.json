@@ -8,6 +8,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.2",
     "@openai/agents": "*",
     "next": "15.3.3",
     "openai": "^5.0.2",

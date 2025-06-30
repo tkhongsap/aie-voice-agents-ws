@@ -25,6 +25,6 @@ const agent = new Agent({
   tools: [getWeather],
 });
 
-const result = await run(agent, "What is the weather in Tokyo?");
+const result = await run(agent, "What is the weather in Bangkok?");
 
 console.log(result.finalOutput);
