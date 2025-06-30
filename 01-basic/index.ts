@@ -1,3 +1,9 @@
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+// Load .env from parent directory
+dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') });
+
 import { Agent, tool, run } from "@openai/agents";
 import z from "zod";
 
@@ -15,7 +21,7 @@ const getWeather = tool({
 const agent = new Agent({
   name: "My Agent",
   instructions: "You are a helpful assistant.",
-  model: "o4-mini",
+  model: "gpt-4.1-nano",
   tools: [getWeather],
 });
 
