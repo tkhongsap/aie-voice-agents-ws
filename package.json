@@ -3,7 +3,8 @@
   "scripts": {
     "start:01": "npm run start --prefix 01-basic",
     "start:02": "npm run dev --prefix 02-voice",
-    "install": "npm install --prefix 01-basic && npm install --prefix 02-voice"
+    "start:03": "npm run start --prefix 03-hello",
+    "install": "npm install --prefix 01-basic && npm install --prefix 02-voice && npm install --prefix 03-hello"
   },
   "dependencies": {
     "@openai/agents": "^0.0.10"

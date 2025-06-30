@@ -22,7 +22,10 @@ From 02-voice directory:
 
 ### Environment Setup
 - Requires Node.js v22 or newer
-- Set `OPENAI_API_KEY` environment variable before running either project
+- Set `OPENAI_API_KEY` environment variable:
+  - For 01-basic: Uses dotenv to load from parent directory's `.env` file
+  - For 02-voice: Create `.env.local` file in the 02-voice directory (already gitignored)
+- 02-voice requires microphone/audio access for voice features
 
 ## Architecture
 
@@ -32,7 +35,9 @@ This is a workshop repository demonstrating OpenAI's Agents SDK with two progres
 A minimal TypeScript example demonstrating:
 - Tool definition using Zod schemas
 - Agent creation with the `@openai/agents` SDK
-- Simple text-based interaction with the `o4-mini` model
+- Simple text-based interaction with the `gpt-4.1-nano` model
+- Uses `dotenv` to load environment variables from parent directory
+- Includes hardcoded `getWeather` tool for demonstration
 
 ### 02-voice
 A Next.js 15 application with real-time voice capabilities:
@@ -46,13 +51,31 @@ A Next.js 15 application with real-time voice capabilities:
 
 ### Technology Stack
 - **OpenAI Agents SDK** (`@openai/agents`) - Core agent functionality
+- **Model Context Protocol SDK** (`@modelcontextprotocol/sdk`) - Required dependency for agents-core
 - **Zod** - Runtime type validation for tool parameters
 - **Next.js 15** with App Router - React framework for 02-voice
 - **Tailwind CSS v4** - Styling for the web interface
 - **TypeScript** - Type safety throughout both projects
+- **dotenv** - Environment variable loading for 01-basic
 
 ### Key Patterns
 1. Tools are defined using Zod schemas for parameter validation
 2. The voice agent uses WebSocket connections for real-time communication
 3. Session tokens are generated server-side for secure client authentication
 4. Agent handoffs allow specialization (e.g., weather queries handled by dedicated agent)
+
+## Important Notes
+
+### Environment Variable Handling
+- **01-basic**: Manually loads `.env` from parent directory using dotenv configuration
+- **02-voice**: Requires `.env.local` file in its own directory (Next.js convention)
+- Never commit `.env` or `.env.local` files - they are gitignored
+
+### Common Issues & Solutions
+- **MCP SDK Error**: Install `@modelcontextprotocol/sdk` in 02-voice if missing
+- **OPENAI_API_KEY Error in 02-voice**: Create `.env.local` file in 02-voice directory
+- **Port Conflicts**: Next.js will automatically use next available port (e.g., 3001 if 3000 in use)
+
+### Model Usage
+- **01-basic**: Uses `gpt-4.1-nano` for text interactions
+- **02-voice**: Uses `gpt-4o-realtime-preview-2025-06-03` for voice interactions
