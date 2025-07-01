@@ -137,3 +137,106 @@ dist
 
 .npmrc
 package-lock.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.sublime-project
+.sublime-workspace
+*.sublime-*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+.sass-cache/
+*.css.map
+*.js.map
+
+# Build and dist directories
+build/
+dist/
+lib/
+es/
+umd/
+cjs/
+
+# Testing
+coverage/
+.coverage
+.pytest_cache/
+test-results/
+playwright-report/
+test-results.xml
+junit.xml
+
+# Package manager lockfiles (keep only one)
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
+
+# Runtime and process files
+.pm2/
+*.sock
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Environment and configuration
+.envrc
+.tool-versions
+.python-version
+.node-version
+.ruby-version
+
+# Linting and formatting
+.eslintcache
+.prettiercache
+.stylelintcache
+
+# Storybook
+storybook-static/
+
+# Turborepo
+.turbo/
+
+# Vercel
+.vercel/
+
+# Sentry
+.sentryclirc
+
+# Local development
+*.local
+.history/
+.fleet/
+
+# AI and ML
+*.model
+*.weights
+*.checkpoint
+
+# Logs and debugging
+debug.log
+error.log
+access.log

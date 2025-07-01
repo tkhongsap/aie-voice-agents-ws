@@ -37,13 +37,13 @@ From 02-voice directory:
 This is a workshop repository demonstrating OpenAI's Agents SDK with three progressive examples:
 
 ### 03-hello
-An interactive chat agent example:
-- Basic agent creation with `@openai/agents` SDK
+An interactive chat agent with conversation memory:
 - Interactive command-line chat using readline interface
-- Uses `gpt-4.1-mini` model for conversations
+- **Conversation Context**: Implements `ConversationContext` interface to maintain chat history
+- **Dynamic Instructions**: Uses `context.context.conversationHistory` to include previous conversation in agent instructions
+- **Context Pattern**: Demonstrates proper usage of `RunContext<T>` for stateful conversations
+- Uses `gpt-4.1-nano` model for conversations
 - Continuous chat loop with graceful exit commands (quit/bye/exit)
-- Error handling and user input validation
-- Demonstrates basic Agent instantiation and interactive execution
 
 ### 01-basic
 A minimal TypeScript example demonstrating:
@@ -73,10 +73,32 @@ A Next.js 15 application with real-time voice capabilities:
 - **dotenv** - Environment variable loading for 01-basic
 
 ### Key Patterns
-1. Tools are defined using Zod schemas for parameter validation
-2. The voice agent uses WebSocket connections for real-time communication
-3. Session tokens are generated server-side for secure client authentication
-4. Agent handoffs allow specialization (e.g., weather queries handled by dedicated agent)
+1. **Tool Definition**: Tools are defined using Zod schemas for parameter validation
+2. **Context Management**: Use `RunContext<T>` for stateful conversations - access via `context.context.yourData`
+3. **Voice Communication**: Voice agents use WebSocket connections for real-time interaction
+4. **Authentication**: Session tokens are generated server-side for secure client authentication
+5. **Agent Handoffs**: Specialized agents can be handed off to (e.g., weather agent with specific personality)
+6. **Environment Loading**: CLI projects use dotenv to load from parent `.env`, Next.js uses `.env.local`
+
+## OpenAI Agents SDK Patterns
+
+### Agent Creation
+- **Text Agents**: Use `Agent` class with optional `RunContext<T>` for state management
+- **Voice Agents**: Use `RealtimeAgent` class for voice interactions
+- **Dynamic Instructions**: Pass a function to `instructions` to generate context-aware prompts
+
+### Context Access in Instructions
+```typescript
+// Correct way to access context in instructions
+instructions: (context) => {
+  // Access your data via context.context
+  return `Instructions using ${context.context.yourData}`;
+}
+```
+
+### Running Agents
+- **Text**: `await run(agent, input, { context: yourContextData })`
+- **Voice**: Create `RealtimeSession` with token authentication
 
 ## Important Notes
 
@@ -92,7 +114,7 @@ A Next.js 15 application with real-time voice capabilities:
 - **Port Conflicts**: Next.js will automatically use next available port (e.g., 3001 if 3000 in use)
 
 ### Model Usage
-- **03-hello**: Uses `gpt-4.1-mini` for interactive chat conversations
+- **03-hello**: Uses `gpt-4.1-nano` for interactive chat conversations
 - **01-basic**: Uses `gpt-4.1-nano` for text interactions
 - **02-voice**: Uses `gpt-4o-realtime-preview-2025-06-03` for voice interactions
 
@@ -127,3 +149,11 @@ A Next.js 15 application with real-time voice capabilities:
 - Never mock data for dev or prod environments - only use mocking in tests
 - Never add stubbing or fake data patterns that affect dev/prod environments
 - Use real data flows for development and production code
+
+## External Resources
+
+- [Agents SDK Documentation](https://openai.github.io/openai-agents-js)
+- [Agents SDK Quickstart](https://openai.github.io/openai-agents-js/guides/quickstart)
+- [Voice Agents Quickstart](https://openai.github.io/openai-agents-js/guides/voice-agents/quickstart/)
+- [Voice Agents Build Guide](https://openai.github.io/openai-agents-js/guides/voice-agents/build/)
+- [OpenAI Platform Voice Agents Guide](https://platform.openai.com/docs/guides/voice-agents)
