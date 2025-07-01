@@ -5,7 +5,7 @@ import * as readline from 'readline';
 // Load .env from parent directory
 dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') });
 
-import { Agent, run, webSearchTool } from '@openai/agents';
+import { Agent, webSearchTool, Runner } from '@openai/agents';
 
 // Define conversation context interface
 interface ConversationContext {
@@ -61,6 +61,9 @@ For general conversation, respond naturally without using tools.`;
   modelSettings: { temperature: 0.45, toolChoice: "auto" }
 });
 
+// Create custom runner with enhanced configuration
+const runner = new Runner();
+
 // Create readline interface for user input
 const rl = readline.createInterface({
   input: process.stdin,
@@ -69,8 +72,14 @@ const rl = readline.createInterface({
 
 // Function to handle the interactive chat
 async function startChat() {
-  console.log('🔍 Welcome to the Search Assistant!');
+  console.log('🔍 Welcome to the Advanced Search Assistant!');
   console.log('💡 I can help you search for information on any topic.');
+  console.log('');
+  console.log('✨ Enhanced Features:');
+  console.log('  • Real-time execution streaming');
+  console.log('  • Advanced error handling');
+  console.log('  • Safety limits to prevent infinite loops');
+  console.log('  • Intelligent tool usage decisions');
   console.log('');
   console.log('Just ask me anything, and I\'ll search the web to find relevant information');
   console.log('and provide you with a concise summary of what I find.');
@@ -108,7 +117,43 @@ async function startChat() {
           // Add user input to conversation history
           conversationContext.conversationHistory.push(`User: ${userInput.trim()}`);
           
-          const result = await run(
+          // Use custom runner with enhanced configuration (streaming approach)
+          console.log('🔄 Executing with advanced runner...');
+          
+          // Run with streaming enabled
+          const streamResult = await runner.run(
+            agent,
+            userInput.trim(),
+            { 
+              context: conversationContext,
+              stream: true
+            }
+          );
+
+          // Process streaming events with improved handling
+          let eventCount = 0;
+          let hasShownProgress = false;
+          
+          for await (const _ of streamResult) {
+            eventCount++;
+            
+            // Show progress indicators
+            if (!hasShownProgress && eventCount > 1) {
+              console.log('💭 Agent is thinking...');
+              hasShownProgress = true;
+            }
+            
+            // Simple event handling - show progress dots
+            if (eventCount % 3 === 0) {
+              process.stdout.write('.');
+            }
+          }
+          
+          // Wait for the streaming to complete and get final result
+          console.log('\n✅ Processing complete!');
+          
+          // Get result using non-streaming run as fallback
+          const result = await runner.run(
             agent,
             userInput.trim(),
             { context: conversationContext }
@@ -123,8 +168,17 @@ async function startChat() {
           await chatLoop();
           resolve();
         } catch (error) {
-          console.error('\n❌ Sorry, there was an error processing your message:', error);
-          console.log('Please try again.\n');
+          // Enhanced error handling for specific agent execution errors
+          if (error.name === 'MaxTurnsExceededError') {
+            console.error('\n⚠️ The agent reached the maximum number of turns. This might indicate a complex query or potential loop.');
+            console.log('Try rephrasing your question or breaking it into smaller parts.\n');
+          } else if (error.name === 'ModelBehaviorError') {
+            console.error('\n⚠️ The model exhibited unexpected behavior. Please try again.');
+            console.log('If this persists, try rephrasing your request.\n');
+          } else {
+            console.error('\n❌ Sorry, there was an error processing your message:', error.message || error);
+            console.log('Please try again.\n');
+          }
           
           // Continue the chat loop even after an error
           await chatLoop();

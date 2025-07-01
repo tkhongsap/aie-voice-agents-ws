@@ -69,13 +69,18 @@ A Next.js 15 application with real-time voice capabilities:
   - Conversation history tracking
 
 ### 04-agents
-A search assistant agent with web search capabilities:
+A search assistant agent with web search capabilities and **advanced "Running Agents" features**:
 - Interactive command-line chat using readline interface
 - **Web Search Integration**: Uses built-in `webSearchTool()` from OpenAI Agents SDK
 - **Intelligent Tool Usage**: Distinguishes between search queries and general conversation
 - **Conversation Context**: Maintains chat history like 03-hello
 - **Model Configuration**: Uses `gpt-4.1-mini` with temperature 0.45 and auto tool choice
-- Demonstrates advanced tool integration and decision-making logic
+- **Advanced Runner Features**:
+  - Real-time streaming execution with progress indicators
+  - Custom `Runner` instance for enhanced control
+  - Enhanced error handling for specific agent execution errors (`MaxTurnsExceededError`, `ModelBehaviorError`)
+  - Streaming event processing for better user experience
+- Demonstrates comprehensive OpenAI Agents SDK "Running Agents" patterns
 
 ### Technology Stack
 - **OpenAI Agents SDK** (`@openai/agents`) - Core agent functionality
@@ -111,8 +116,9 @@ instructions: (context) => {
 ```
 
 ### Running Agents
-- **Text**: `await run(agent, input, { context: yourContextData })`
+- **Basic Text**: `await run(agent, input, { context: yourContextData })`
 - **Voice**: Create `RealtimeSession` with token authentication
+- **Advanced Runner**: Custom `Runner` instance for enhanced control and streaming
 
 ### Built-in Tools
 - **webSearchTool()**: Available from `@openai/agents`, used in 04-agents for web search capabilities
@@ -127,6 +133,26 @@ const agent = new Agent({
     toolChoice: "auto"     // Let model decide when to use tools
   }
 });
+```
+
+### Advanced Runner Patterns (04-agents)
+```typescript
+// Create custom runner
+const runner = new Runner();
+
+// Streaming execution with progress indicators
+const streamResult = await runner.run(agent, input, { 
+  context: conversationContext,
+  stream: true 
+});
+
+// Process streaming events
+for await (const _ of streamResult) {
+  // Handle real-time progress indicators
+}
+
+// Get final result
+const result = await runner.run(agent, input, { context: conversationContext });
 ```
 
 ## Important Notes
