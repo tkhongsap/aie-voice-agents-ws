@@ -11,12 +11,16 @@ From the root directory:
 - `npm run start:01` - Run the basic text agent example  
 - `npm run start:02` - Start the Next.js voice agent development server
 - `npm run start:03` - Run the hello world agent example
+- `npm run start:04` - Run the search assistant agent example
 
 From 01-basic directory:
 - `npm start` - Run the TypeScript agent directly with tsx
 
 From 03-hello directory:
 - `npm start` - Run the hello world agent example with tsx
+
+From 04-agents directory:
+- `npm start` - Run the search assistant agent with tsx
 
 From 02-voice directory:
 - `npm run dev` - Start Next.js dev server with Turbopack
@@ -29,12 +33,13 @@ From 02-voice directory:
 - Set `OPENAI_API_KEY` environment variable:
   - For 03-hello: Uses dotenv to load from parent directory's `.env` file
   - For 01-basic: Uses dotenv to load from parent directory's `.env` file
+  - For 04-agents: Uses dotenv to load from parent directory's `.env` file
   - For 02-voice: Create `.env.local` file in the 02-voice directory (already gitignored)
 - 02-voice requires microphone/audio access for voice features
 
 ## Architecture
 
-This is a workshop repository demonstrating OpenAI's Agents SDK with three progressive examples:
+This is a workshop repository demonstrating OpenAI's Agents SDK with four progressive examples:
 
 ### 03-hello
 An interactive chat agent with conversation memory:
@@ -62,6 +67,20 @@ A Next.js 15 application with real-time voice capabilities:
   - Agent handoff capabilities (main agent can hand off to weather agent)
   - Tool approval flow for interactive confirmation
   - Conversation history tracking
+
+### 04-agents
+A search assistant agent with web search capabilities and **advanced "Running Agents" features**:
+- Interactive command-line chat using readline interface
+- **Web Search Integration**: Uses built-in `webSearchTool()` from OpenAI Agents SDK
+- **Intelligent Tool Usage**: Distinguishes between search queries and general conversation
+- **Conversation Context**: Maintains chat history like 03-hello
+- **Model Configuration**: Uses `gpt-4.1-mini` with temperature 0.45 and auto tool choice
+- **Advanced Runner Features**:
+  - Real-time streaming execution with progress indicators
+  - Custom `Runner` instance for enhanced control
+  - Enhanced error handling for specific agent execution errors (`MaxTurnsExceededError`, `ModelBehaviorError`)
+  - Streaming event processing for better user experience
+- Demonstrates comprehensive OpenAI Agents SDK "Running Agents" patterns
 
 ### Technology Stack
 - **OpenAI Agents SDK** (`@openai/agents`) - Core agent functionality
@@ -97,14 +116,51 @@ instructions: (context) => {
 ```
 
 ### Running Agents
-- **Text**: `await run(agent, input, { context: yourContextData })`
+- **Basic Text**: `await run(agent, input, { context: yourContextData })`
 - **Voice**: Create `RealtimeSession` with token authentication
+- **Advanced Runner**: Custom `Runner` instance for enhanced control and streaming
+
+### Built-in Tools
+- **webSearchTool()**: Available from `@openai/agents`, used in 04-agents for web search capabilities
+- **Custom Tools**: Defined with Zod schemas for parameter validation (see 01-basic example)
+
+### Model Settings Configuration
+```typescript
+const agent = new Agent({
+  // ... other config
+  modelSettings: { 
+    temperature: 0.45,     // Control randomness (04-agents example)
+    toolChoice: "auto"     // Let model decide when to use tools
+  }
+});
+```
+
+### Advanced Runner Patterns (04-agents)
+```typescript
+// Create custom runner
+const runner = new Runner();
+
+// Streaming execution with progress indicators
+const streamResult = await runner.run(agent, input, { 
+  context: conversationContext,
+  stream: true 
+});
+
+// Process streaming events
+for await (const _ of streamResult) {
+  // Handle real-time progress indicators
+}
+
+// Get final result
+const result = await runner.run(agent, input, { context: conversationContext });
+```
 
 ## Important Notes
 
 ### Environment Variable Handling
 - **03-hello**: Manually loads `.env` from parent directory using dotenv configuration
 - **01-basic**: Manually loads `.env` from parent directory using dotenv configuration
+- **04-agents**: Manually loads `.env` from parent directory using dotenv configuration
 - **02-voice**: Requires `.env.local` file in its own directory (Next.js convention)
 - Never commit `.env` or `.env.local` files - they are gitignored
 
@@ -116,6 +172,7 @@ instructions: (context) => {
 ### Model Usage
 - **03-hello**: Uses `gpt-4.1-nano` for interactive chat conversations
 - **01-basic**: Uses `gpt-4.1-nano` for text interactions
+- **04-agents**: Uses `gpt-4.1-mini` with temperature 0.45 for search operations
 - **02-voice**: Uses `gpt-4o-realtime-preview-2025-06-03` for voice interactions
 
 ## Development Guidelines
