@@ -58,6 +58,7 @@ For general conversation, respond naturally without using tools.`;
   },
   model: "gpt-4.1-mini",
   tools: [webSearchTool()],
+  modelSettings: { temperature: 0.45, toolChoice: "auto" }
 });
 
 // Create readline interface for user input
