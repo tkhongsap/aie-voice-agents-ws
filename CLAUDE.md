@@ -7,12 +7,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Development Commands
 
 From the root directory:
-- `npm install` - Install dependencies for both projects
-- `npm run start:01` - Run the basic text agent example
+- `npm install` - Install dependencies for all projects
+- `npm run start:01` - Run the basic text agent example  
 - `npm run start:02` - Start the Next.js voice agent development server
+- `npm run start:03` - Run the hello world agent example
 
 From 01-basic directory:
 - `npm start` - Run the TypeScript agent directly with tsx
+
+From 03-hello directory:
+- `npm start` - Run the hello world agent example with tsx
 
 From 02-voice directory:
 - `npm run dev` - Start Next.js dev server with Turbopack
@@ -23,13 +27,23 @@ From 02-voice directory:
 ### Environment Setup
 - Requires Node.js v22 or newer
 - Set `OPENAI_API_KEY` environment variable:
+  - For 03-hello: Uses dotenv to load from parent directory's `.env` file
   - For 01-basic: Uses dotenv to load from parent directory's `.env` file
   - For 02-voice: Create `.env.local` file in the 02-voice directory (already gitignored)
 - 02-voice requires microphone/audio access for voice features
 
 ## Architecture
 
-This is a workshop repository demonstrating OpenAI's Agents SDK with two progressive examples:
+This is a workshop repository demonstrating OpenAI's Agents SDK with three progressive examples:
+
+### 03-hello
+An interactive chat agent example:
+- Basic agent creation with `@openai/agents` SDK
+- Interactive command-line chat using readline interface
+- Uses `gpt-4.1-mini` model for conversations
+- Continuous chat loop with graceful exit commands (quit/bye/exit)
+- Error handling and user input validation
+- Demonstrates basic Agent instantiation and interactive execution
 
 ### 01-basic
 A minimal TypeScript example demonstrating:
@@ -67,6 +81,7 @@ A Next.js 15 application with real-time voice capabilities:
 ## Important Notes
 
 ### Environment Variable Handling
+- **03-hello**: Manually loads `.env` from parent directory using dotenv configuration
 - **01-basic**: Manually loads `.env` from parent directory using dotenv configuration
 - **02-voice**: Requires `.env.local` file in its own directory (Next.js convention)
 - Never commit `.env` or `.env.local` files - they are gitignored
@@ -77,5 +92,38 @@ A Next.js 15 application with real-time voice capabilities:
 - **Port Conflicts**: Next.js will automatically use next available port (e.g., 3001 if 3000 in use)
 
 ### Model Usage
+- **03-hello**: Uses `gpt-4.1-mini` for interactive chat conversations
 - **01-basic**: Uses `gpt-4.1-nano` for text interactions
 - **02-voice**: Uses `gpt-4o-realtime-preview-2025-06-03` for voice interactions
+
+## Development Guidelines
+
+### Server Management
+- After making changes, ALWAYS restart the server for testing
+- Kill all existing related servers before starting new ones to avoid port conflicts
+- Use `pkill -f` or `lsof -ti:PORT | xargs kill` to clean up running processes
+
+### Code Development Principles
+- **Iterate, don't recreate**: Always look for existing code to build upon instead of creating new implementations
+- **Preserve patterns**: Do not drastically change established patterns - iterate on existing ones first
+- **Prefer simplicity**: Choose simple solutions over complex ones
+- **Avoid duplication**: Check for similar functionality elsewhere in the codebase before implementing
+- **Environment awareness**: Write code that considers dev, test, and prod environments
+
+### Change Management
+- Only make changes that are explicitly requested or clearly related to the task
+- When fixing bugs, exhaust all options with existing implementation before introducing new patterns
+- If new patterns are introduced, remove old implementations to prevent duplicate logic
+- Focus only on code areas relevant to the task - avoid unrelated changes
+- Avoid major architectural changes to proven features unless explicitly instructed
+
+### Code Organization
+- Keep files under 200-300 lines - refactor when approaching this limit
+- Maintain a clean and organized codebase structure
+- Avoid writing one-time scripts in permanent files
+- Write thorough tests for all major functionality
+
+### Data Handling
+- Never mock data for dev or prod environments - only use mocking in tests
+- Never add stubbing or fake data patterns that affect dev/prod environments
+- Use real data flows for development and production code
