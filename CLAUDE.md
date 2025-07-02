@@ -28,6 +28,45 @@ From 02-voice directory:
 - `npm run start` - Start production server
 - `npm run lint` - Run Next.js linter
 
+### Claude Code Commands
+
+#### /context-priming
+**Command**: When you see `/context-priming`, immediately read the specified files below to establish comprehensive project context.
+
+**Purpose**: Provides Claude Code with full understanding of the project structure, patterns, and implementation details before beginning work.
+
+**Files to Read**:
+- `CLAUDE.md` - Project instructions, patterns, and development guidelines
+- `README.md` - Project overview, setup instructions, and resources
+- **Package/Dependency Files** (read whichever exists):
+  - `package.json` (JavaScript/TypeScript)
+  - `requirements.txt`, `pyproject.toml`, `setup.py` (Python)
+  - `Cargo.toml` (Rust)
+  - `go.mod` (Go)
+  - `pom.xml`, `build.gradle` (Java)
+  - `Gemfile` (Ruby)
+  - `composer.json` (PHP)
+- **Configuration Files**: `tsconfig.json`, `.env.example`, `config.*`, `settings.*`, etc.
+- **Entry Points**: `index.*`, `main.*`, `app.*`, `server.*` in root or primary directories
+- **Source Directories**: Explore `src/`, `lib/`, `app/`, `packages/`, or language-specific conventions
+- **Test Directories**: Check `test/`, `tests/`, `__tests__/`, `spec/` for understanding code structure
+- **Documentation**: Any `docs/` directory or additional `*.md` files
+
+**Expected Output Format**:
+1. **Project Type**: Detected language(s) and framework(s)
+2. **Tech Stack**: Key dependencies and tools identified
+3. **Project Structure**: Directory layout and organization patterns
+4. **Key Components**: Main modules, services, or features discovered
+5. **Development Patterns**: Coding conventions, architectural patterns observed
+6. **Setup Requirements**: Environment variables, build steps, or special configurations needed
+
+**When to Use**:
+- At the start of new coding sessions
+- When switching between different project areas or modules
+- Before implementing new features or making significant changes
+- When you need to understand the full project architecture and patterns
+- When joining a new project or codebase
+
 ### Environment Setup
 - Requires Node.js v22 or newer
 - Set `OPENAI_API_KEY` environment variable:
