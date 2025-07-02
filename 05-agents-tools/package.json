@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "05-agents-tools",
+  "type": "module",
+  "scripts": {
+    "start": "tsx index.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "@types/node": "^20.0.0"
+  },
+  "dependencies": {
+    "@openai/agents": "latest",
+    "dotenv": "^17.0.0",
+    "zod": "^3.25.49",
+    "axios": "^1.7.0"
+  }
+}
