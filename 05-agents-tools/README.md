@@ -1,12 +1,13 @@
-# 05-agents-tools - Advanced Assistant with Tools
+# 05-agents-tools - Advanced Assistant with Tools & Documentation
 
-An advanced AI assistant that combines web search capabilities with live weather data using OpenAI Agents framework.
+An advanced AI assistant that combines web search capabilities, live weather data, and latest documentation access via Context7 MCP using OpenAI Agents framework.
 
 ## Features
 
 - 🌤️ **Live Weather Data** - Get current weather information for any location worldwide
 - 🔍 **Web Search** - Search the internet for information on any topic
-- 💬 **Intelligent Tool Selection** - Automatically determines when to use tools vs. general conversation
+- � **Latest Documentation** - Access up-to-date library and framework docs via Context7 MCP
+- �💬 **Intelligent Tool Selection** - Automatically determines when to use tools vs. general conversation
 - 🔄 **Streaming Responses** - Real-time response processing with progress indicators
 - 📝 **Conversation History** - Maintains context across the conversation
 
@@ -56,6 +57,14 @@ npm run start:05
 - "Look up facts about the solar system"
 - "What are the latest developments in quantum computing?"
 
+### Documentation Queries
+- "What are the latest features in React 18?"
+- "Show me the OpenAI API documentation"
+- "Get the latest LangChain documentation"
+- "What's new in Next.js 14?"
+- "How do I use Anthropic Claude API?"
+- "Latest features in TypeScript"
+
 ### General Conversation
 - "Hello, how are you?"
 - "What can you help me with?"
@@ -80,9 +89,17 @@ npm run start:05
 - Handles various search topics and queries
 - Provides up-to-date information beyond training data
 
+### Documentation Tool (Context7 MCP)
+- Retrieves the latest documentation for libraries and frameworks
+- Accesses version-specific API documentation for rapidly evolving tools
+- Supports popular libraries like React, Next.js, OpenAI, LangChain, Anthropic
+- Uses Context7 MCP server for up-to-date technical information
+- Automatically falls back to alternative API if MCP server is unavailable
+
 ### Smart Tool Selection
 The assistant intelligently determines when to use tools:
 - **Weather queries** trigger the weather tool
+- **Documentation queries** trigger the Context7 MCP tool
 - **Search queries** trigger web search
 - **General conversation** uses natural language without tools
 
@@ -104,6 +121,8 @@ The application includes comprehensive error handling for:
 
 - Built with OpenAI Agents framework
 - Uses GPT-4.1-mini model for efficient processing
+- Integrates Context7 MCP server for latest documentation access
 - Implements streaming responses for better user experience
 - Maintains conversation context for coherent interactions
 - Uses TypeScript for type safety
+- Features robust error handling and fallback mechanisms
