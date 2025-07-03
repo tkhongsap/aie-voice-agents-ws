@@ -13,6 +13,7 @@ From the root directory:
 - `npm run start:03` - Run the hello world agent example
 - `npm run start:04` - Run the search assistant agent example
 - `npm run start:05` - Run the multi-tool assistant with weather and docs
+- `npm run start:06` - Run the advanced MCP server integration assistant
 
 From individual project directories:
 - `npm start` - Run TypeScript agents directly with tsx (01, 03, 04, 05)
@@ -24,10 +25,12 @@ From individual project directories:
 - Kill existing servers before starting new ones: `pkill -f "npm run start"` or `lsof -ti:3000 | xargs kill`
 - Verify environment variables are loaded: Check for API key errors in console
 - Test weather functionality (05): Requires `OPENWEATHER_API_KEY` in .env
+- Test air quality functionality (06): Requires `AQICN_API_KEY` in .env
+- No formal testing framework configured - this is a workshop environment focused on interactive development
 
 ## Architecture
 
-This is a workshop repository demonstrating OpenAI's Agents SDK with five progressive examples:
+This is a workshop repository demonstrating OpenAI's Agents SDK with six progressive examples:
 
 ### Project Structure & Capabilities
 
@@ -60,6 +63,14 @@ This is a workshop repository demonstrating OpenAI's Agents SDK with five progre
 - Documentation access via Context7 MCP
 - Intelligent tool selection based on query patterns
 - Fallback mechanisms for API failures
+
+**06-agents-mcps**: Advanced MCP server integration
+- Pure MCP server architecture (no traditional tools)
+- Weather MCP server with OpenWeatherMap API
+- Air quality MCP server with AQICN API
+- Context7 MCP server for documentation
+- Dynamic server management and connection handling
+- Comprehensive error handling and fallback strategies
 
 ### Key Patterns
 
@@ -109,10 +120,11 @@ const streamResult = await runner.run(agent, input, {
 ### Environment Configuration
 
 **Environment Variables**:
-- CLI projects (01, 03, 04, 05): Load `.env` from parent directory using `dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') })`
+- CLI projects (01, 03, 04, 05, 06): Load `.env` from parent directory using `dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') })`
 - Next.js (02): Uses `.env.local` in its own directory
 - Required: `OPENAI_API_KEY`
-- Optional: `OPENWEATHER_API_KEY` (for 05-agents-tools weather feature)
+- Optional: `OPENWEATHER_API_KEY` (for 05-agents-tools and 06-agents-mcps weather features)
+- Optional: `AQICN_API_KEY` (for 06-agents-mcps air quality feature)
 
 **Model Selection**:
 - Simple interactions: `gpt-4.1-nano`
@@ -126,6 +138,12 @@ const streamResult = await runner.run(agent, input, {
 - Use TypeScript interfaces for context types
 - Implement proper error handling with user-friendly messages
 - Use streaming for better UX in long-running operations
+- Follow the progressive complexity pattern: start simple, add sophistication incrementally
+
+**Module Structure Patterns**:
+- Simple modules (01, 03, 04): Single `index.ts` file with direct execution
+- Advanced modules (05, 06): Structured `/src` directory with agent/, chat/, tools/, and utils/ folders
+- Next.js module (02): App Router with server actions for secure token generation
 
 **Tool Development**:
 - Define clear, descriptive tool names and descriptions
@@ -138,6 +156,13 @@ const streamResult = await runner.run(agent, input, {
 - Limit history size to prevent token overflow
 - Access context data via `context.context` in instructions
 - Pass context consistently through agent runs
+
+**MCP Server Management**:
+- **Server Initialization**: Automatic connection handling for MCP servers
+- **Connection Monitoring**: Real-time status tracking and health checks
+- **Error Handling**: Graceful degradation when servers are unavailable
+- **Dynamic Instructions**: Agent capabilities adjust based on connected servers
+- **Fallback Strategies**: Intelligent fallback when specific servers fail
 
 ### Common Issues & Solutions
 
@@ -158,6 +183,33 @@ const streamResult = await runner.run(agent, input, {
 - `MaxTurnsExceededError`: Simplify query or increase turn limit
 - `ModelBehaviorError`: Retry or rephrase request
 - Tool execution failures: Check API keys and network connectivity
+
+**MCP Server Issues**:
+- Server connection failures: Check API keys and network connectivity
+- Server timeout errors: Increase timeout values in server configuration
+- Invalid responses: Verify API key permissions and rate limits
+- Missing servers: Ensure required environment variables are set (OPENWEATHER_API_KEY, AQICN_API_KEY)
+
+## Quick Reference
+
+### Workshop Progression
+1. **01-basic**: Foundation concepts (single tool, basic execution)
+2. **02-voice**: Next.js voice application (WebSocket, real-time)
+3. **03-hello**: Interactive chat (conversation context, loops)
+4. **04-agents**: Advanced features (web search, streaming, error handling)
+5. **05-agents-tools**: Multi-tool integration (weather, web search, MCP)
+6. **06-agents-mcps**: Pure MCP architecture (air quality, weather, docs)
+
+### Key Patterns
+- **Environment loading**: `dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') })`
+- **Context management**: Always truncate history with `.slice(-10)`
+- **Agent execution**: `await run(agent, input, { context })`
+- **Error handling**: Check for `MaxTurnsExceededError` and `ModelBehaviorError`
+- **Exit commands**: `quit`, `bye`, `exit` for CLI modules
+
+### Port Usage
+- **Next.js (02-voice)**: Port 3000 (auto-assigns if occupied)
+- **CLI modules**: No port usage (direct console interaction)
 
 ## External Resources
 
