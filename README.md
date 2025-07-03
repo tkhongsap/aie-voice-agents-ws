@@ -24,7 +24,7 @@ This will automatically install the [OpenAI Agents SDK](https://openai.github.io
 
 ## Project Structure
 
-This workshop contains 5 progressive modules that build from basic text agents to advanced voice agents with multiple tools:
+This workshop contains 6 progressive modules that build from basic text agents to advanced voice agents with multiple tools and MCP servers:
 
 ### [01-basic](01-basic/) - Basic Agent with Tools
 A simple text-based agent to familiarize yourself with the [OpenAI Agents SDK for TypeScript](https://openai.github.io/openai-agents-js/).
@@ -63,6 +63,15 @@ The most advanced module featuring multiple integrated tools and services.
 - 🔄 Streaming responses with progress indicators
 - 📝 Conversation history and context management
 
+### [06-agents-mcps](06-agents-mcps/) - MCP Server Integration
+The ultimate module showcasing Model Context Protocol (MCP) server integration.
+- 🌤️ **Weather MCP Server** - Real-time weather data via custom MCP server implementation
+- 🌬️ **Air Quality MCP Server** - Live air quality data and health recommendations
+- 📚 **Context7 MCP Server** - Latest documentation access via Context7 MCP server
+- 🔄 **Dynamic Server Management** - Automatic connection handling and fallback strategies
+- 💬 **Intelligent Conversations** - Context-aware responses based on connected MCP servers
+- 🔧 **Modular Architecture** - Clean separation of concerns with extensible design
+
 ## Running Your Code
 
 Each module can be run independently using the following commands:
@@ -92,6 +101,11 @@ npm run start:04
 npm run start:05
 ```
 
+### 06-agents-mcps
+```bash
+npm run start:06
+```
+
 ## Workshop Progression
 
 The workshop is designed to progressively build your understanding:
@@ -100,18 +114,22 @@ The workshop is designed to progressively build your understanding:
 2. **Move to 02-voice** to explore voice capabilities in a web environment
 3. **Try 03-hello** to learn about interactive chat and conversation management
 4. **Advance to 04-agents** to understand web search integration and streaming
-5. **Complete with 05-agents-tools** to see a full-featured multi-tool assistant
+5. **Progress to 05-agents-tools** to see a full-featured multi-tool assistant
+6. **Complete with 06-agents-mcps** to master MCP server integration and advanced architecture
 
 ## Environment Variables
 
-For the advanced modules (04-agents and 05-agents-tools), you'll need additional API keys:
+For the advanced modules (04-agents, 05-agents-tools, and 06-agents-mcps), you'll need additional API keys:
 
 ```env
 # Required for all modules
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Required for 05-agents-tools weather functionality
+# Required for 05-agents-tools and 06-agents-mcps weather functionality
 OPENWEATHER_API_KEY=your_openweather_api_key_here
+
+# Required for 06-agents-mcps air quality functionality
+AQICN_API_KEY=your_aqicn_api_key_here
 
 # Optional for 05-agents-tools and 06-agents-mcps documentation features
 CONTEXT7_API_KEY=your_context7_api_key_here
@@ -146,5 +164,7 @@ cp 06-agents-mcps/.env.example 06-agents-mcps/.env
 - [Agents SDK Examples](https://github.com/openai/openai-agents-js-internal/tree/main/examples)
 - [Details about Voice Agent Features](https://openai.github.io/openai-agents-js/guides/voice-agents/build/)
 - [Voice Agents Guide on the OpenAI Docs](https://platform.openai.com/docs/guides/voice-agents)
+- [Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs) - For understanding MCP servers
 - [OpenWeatherMap API](https://openweathermap.org/api) - For weather data
+- [AQICN API](https://aqicn.org/api/) - For air quality data
 - [Context7 MCP](https://context7.com) - For documentation access
