@@ -112,6 +112,31 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 # Required for 05-agents-tools weather functionality
 OPENWEATHER_API_KEY=your_openweather_api_key_here
+
+# Optional for 05-agents-tools and 06-agents-mcps documentation features
+CONTEXT7_API_KEY=your_context7_api_key_here
+```
+
+**Security Note**: Use the `.env.example` files in each module directory to set up your environment variables. See [SECURITY.md](SECURITY.md) for complete security guidelines.
+
+## Security
+
+⚠️ **Important**: This repository has addressed a security vulnerability where API keys were previously exposed in commit history. See [SECURITY.md](SECURITY.md) for:
+
+- Complete security guidelines
+- Required immediate actions for exposed keys
+- Best practices for API key management
+- Pre-commit hook setup for key detection
+
+To set up security measures:
+
+```bash
+# Set up pre-commit hook for API key detection
+./scripts/setup-pre-commit-hook.sh
+
+# Copy environment template files
+cp 05-agents-tools/.env.example 05-agents-tools/.env
+cp 06-agents-mcps/.env.example 06-agents-mcps/.env
 ```
 
 ## Resources

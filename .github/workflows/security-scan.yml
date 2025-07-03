@@ -1,0 +1,108 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  secret-scan:
+    runs-on: ubuntu-latest
+    name: Secret Scanning
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Run TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+          
+      - name: Run GitLeaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  dependency-scan:
+    runs-on: ubuntu-latest
+    name: Dependency Scanning
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+          
+      - name: Upload result to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: snyk.sarif
+          
+  code-security:
+    runs-on: ubuntu-latest
+    name: Code Security Analysis
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: javascript
+          
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        
+  api-key-check:
+    runs-on: ubuntu-latest
+    name: API Key Pattern Check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check for hardcoded API keys
+        run: |
+          # Check for common API key patterns
+          if grep -r "sk-\|pk_\|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" --include="*.ts" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.git .; then
+            echo "❌ Potential API key detected in source code!"
+            echo "Please use environment variables instead."
+            exit 1
+          else
+            echo "✅ No hardcoded API keys detected."
+          fi
+          
+      - name: Check for exposed Context7 key
+        run: |
+          # Check for the specific exposed key
+          if grep -r "7c6c26f1-c7ec-4cf0-96a8-1a4e48004d4e" --exclude-dir=node_modules --exclude-dir=.git .; then
+            echo "❌ Exposed Context7 API key found!"
+            echo "This key was compromised and should not be used."
+            exit 1
+          else
+            echo "✅ No exposed Context7 key detected."
+          fi
+          
+      - name: Verify .env files are ignored
+        run: |
+          if git ls-files | grep -E "\.env$"; then
+            echo "❌ .env files are being tracked by git!"
+            echo "Please remove them and add to .gitignore"
+            exit 1
+          else
+            echo "✅ .env files are properly ignored."
+          fi 
