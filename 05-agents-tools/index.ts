@@ -271,8 +271,8 @@ async function startChat() {
   console.log('✨ Available Tools:');
   console.log('  • 🌤️ Weather Tool - Get live weather data for any location');
   console.log('  • 🔍 Web Search - Search the internet for information');
-  console.log('  • � Documentation Tool - Get latest docs via Context7 MCP');
-  console.log('  • �💬 General Chat - Have conversations without tools');
+  console.log('  • 📚 Documentation Tool - Get latest docs via Context7 MCP');
+  console.log('  • 💬 General Chat - Have conversations without tools');
   console.log('');
   console.log('🌍 Weather Examples:');
   console.log('  • "What\'s the weather in New York?"');
