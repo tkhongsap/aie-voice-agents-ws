@@ -90,11 +90,11 @@ npm run start:05
 - Provides up-to-date information beyond training data
 
 ### Documentation Tool (Context7 MCP)
-- Retrieves the latest documentation for libraries and frameworks
+- Retrieves the latest documentation for libraries and frameworks via Context7 MCP server
 - Accesses version-specific API documentation for rapidly evolving tools
-- Supports popular libraries like React, Next.js, OpenAI, LangChain, Anthropic
-- Uses Context7 MCP server for up-to-date technical information
-- Automatically falls back to alternative API if MCP server is unavailable
+- Supports popular libraries like React, Next.js, OpenAI, LangChain, Anthropic, TypeScript, Node.js, etc.
+- Uses two-step process: resolve-library-id → get-library-docs for accurate results
+- Provides up-to-date, authoritative documentation directly from official sources
 
 ### Smart Tool Selection
 The assistant intelligently determines when to use tools:
@@ -126,3 +126,63 @@ The application includes comprehensive error handling for:
 - Maintains conversation context for coherent interactions
 - Uses TypeScript for type safety
 - Features robust error handling and fallback mechanisms
+
+## Architecture
+
+The application follows a modular architecture with clear separation of concerns:
+
+### Project Structure
+```
+05-agents-tools/
+├── src/
+│   ├── index.ts          # Main entry point
+│   ├── config/           # Configuration management
+│   │   ├── constants.ts  # Application constants
+│   │   ├── schemas.ts    # Zod validation schemas
+│   │   └── index.ts      # Config exports
+│   ├── types/            # TypeScript type definitions
+│   │   └── index.ts      # Shared interfaces and types
+│   ├── tools/            # Tool implementations
+│   │   ├── weather-tool.ts      # Weather API integration
+│   │   ├── tool-factory.ts      # Tool creation utilities
+│   │   └── index.ts             # Tool exports
+│   ├── servers/          # MCP server integrations
+│   │   ├── context7-server.ts   # Context7 documentation server
+│   │   └── index.ts             # Server exports
+│   ├── agent/            # Agent configuration
+│   │   ├── agent-config.ts      # Agent settings
+│   │   ├── agent-factory.ts     # Agent creation
+│   │   ├── instructions.ts      # Dynamic instructions
+│   │   └── index.ts             # Agent exports
+│   ├── chat/             # Chat interface
+│   │   ├── chat-interface.ts    # Main chat controller
+│   │   ├── chat-loop.ts         # Conversation loop
+│   │   ├── streaming-handler.ts # Stream processing
+│   │   ├── query-classifier.ts  # Query type detection
+│   │   └── index.ts             # Chat exports
+│   └── utils/            # Utility functions
+│       ├── cli-interface.ts     # CLI utilities
+│       ├── error-handler.ts     # Error handling
+│       └── index.ts             # Utils exports
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+### Key Modules
+
+1. **Config Module**: Centralizes configuration and environment management
+2. **Types Module**: Defines shared TypeScript interfaces and types
+3. **Tools Module**: Implements tool integrations (weather, web search)
+4. **Servers Module**: Manages MCP server connections
+5. **Agent Module**: Handles agent creation and configuration
+6. **Chat Module**: Manages the interactive chat interface
+7. **Utils Module**: Provides utility functions and error handling
+
+### Design Principles
+
+- **Separation of Concerns**: Each module has a single, well-defined responsibility
+- **Type Safety**: Full TypeScript implementation with strict typing
+- **Error Resilience**: Comprehensive error handling at all levels
+- **Extensibility**: Easy to add new tools or modify existing functionality
+- **Testability**: Modular design enables unit testing of individual components
