@@ -7,7 +7,7 @@
     "start:04": "npm run start --prefix 04-agents",
     "start:05": "npm run start --prefix 05-agents-tools",
     "start:06": "npm run start --prefix 06-agents-mcps",
-    "install": "npm install --prefix 01-basic && npm install --prefix 02-voice && npm install --prefix 03-hello && npm install --prefix 04-agents && npm install --prefix 05-agents-tools && npm install --prefix 06-agents-mcps"
+    "install": "npm install --prefix 01-basic & npm install --prefix 02-voice & npm install --prefix 03-hello & npm install --prefix 04-agents & npm install --prefix 05-agents-tools & npm install --prefix 06-agents-mcps & wait"
   },
   "dependencies": {
     "@openai/agents": "^0.0.10"

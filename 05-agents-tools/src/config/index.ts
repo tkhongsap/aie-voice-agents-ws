@@ -33,13 +33,22 @@ export const AGENT_CONFIG = {
   MAX_CONVERSATION_HISTORY: 10,
 } as const;
 
-// MCP Server configuration
-export const MCP_CONFIG = {
-  CONTEXT7_SERVER: {
-    NAME: 'Context7 Documentation Server',
-    COMMAND: `npx -y @smithery/cli@latest run @upstash/context7-mcp --key ${ENV_VARS.CONTEXT7_API_KEY || 'your_context7_api_key_here'}`
+// MCP Server configuration (conditional based on API key availability)
+export const getMcpConfig = () => {
+  const config: any = {};
+  
+  if (ENV_VARS.CONTEXT7_API_KEY) {
+    config.CONTEXT7_SERVER = {
+      NAME: 'Context7 Documentation Server',
+      COMMAND: `npx -y @smithery/cli@latest run @upstash/context7-mcp --key ${ENV_VARS.CONTEXT7_API_KEY}`
+    };
   }
-} as const;
+  
+  return config;
+};
+
+// Legacy export for backward compatibility
+export const MCP_CONFIG = getMcpConfig();
 
 // Application messages
 export const APP_MESSAGES = {
@@ -146,24 +155,32 @@ export const config: AppConfig = {
 };
 
 // Validation helper
-export const validateConfig = (): { isValid: boolean; errors: string[] } => {
+export const validateConfig = (): { 
+  isValid: boolean; 
+  errors: string[]; 
+  warnings: string[] 
+} => {
   const errors: string[] = [];
+  const warnings: string[] = [];
   
+  // Required keys
   if (!config.openaiApiKey) {
     errors.push('OPENAI_API_KEY is required');
   }
   
+  // Optional keys
   if (!config.weatherApiKey) {
-    errors.push('OPENWEATHER_API_KEY is recommended for weather functionality');
+    warnings.push('OPENWEATHER_API_KEY is recommended for weather functionality');
   }
   
   if (!config.context7ApiKey) {
-    errors.push('CONTEXT7_API_KEY is recommended for documentation functionality');
+    warnings.push('CONTEXT7_API_KEY is recommended for documentation functionality');
   }
   
   return {
     isValid: errors.length === 0,
     errors,
+    warnings,
   };
 };
 

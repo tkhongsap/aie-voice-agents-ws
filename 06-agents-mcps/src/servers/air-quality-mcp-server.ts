@@ -208,10 +208,14 @@ export class AirQualityMCPServer {
 /**
  * Air Quality MCP server configuration
  */
-export const airQualityServerConfig: MCPServerConfig = {
+export const airQualityServerConfig: MCPServerConfig = config.mcpServers.airQuality ? {
   name: config.mcpServers.airQuality.name,
   command: config.mcpServers.airQuality.command,
   url: config.mcpServers.airQuality.url,
+} : {
+  name: 'Air Quality MCP Server (Not Available)',
+  command: '',
+  url: 'https://api.waqi.info',
 };
 
 /**
