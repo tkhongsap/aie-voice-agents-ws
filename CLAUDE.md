@@ -12,239 +12,152 @@ From the root directory:
 - `npm run start:02` - Start the Next.js voice agent development server
 - `npm run start:03` - Run the hello world agent example
 - `npm run start:04` - Run the search assistant agent example
+- `npm run start:05` - Run the multi-tool assistant with weather and docs
 
-From 01-basic directory:
-- `npm start` - Run the TypeScript agent directly with tsx
+From individual project directories:
+- `npm start` - Run TypeScript agents directly with tsx (01, 03, 04, 05)
+- `npm run dev` - Start Next.js dev server with Turbopack (02-voice only)
+- `npm run build` - Build for production (02-voice only)
+- `npm run lint` - Run Next.js linter (02-voice only)
 
-From 03-hello directory:
-- `npm start` - Run the hello world agent example with tsx
-
-From 04-agents directory:
-- `npm start` - Run the search assistant agent with tsx
-
-From 02-voice directory:
-- `npm run dev` - Start Next.js dev server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run Next.js linter
-
-### Claude Code Commands
-
-#### /context-priming
-**Command**: When you see `/context-priming`, immediately read the specified files below to establish comprehensive project context.
-
-**Purpose**: Provides Claude Code with full understanding of the project structure, patterns, and implementation details before beginning work.
-
-**Files to Read**:
-- `CLAUDE.md` - Project instructions, patterns, and development guidelines
-- `README.md` - Project overview, setup instructions, and resources
-- **Package/Dependency Files** (read whichever exists):
-  - `package.json` (JavaScript/TypeScript)
-  - `requirements.txt`, `pyproject.toml`, `setup.py` (Python)
-  - `Cargo.toml` (Rust)
-  - `go.mod` (Go)
-  - `pom.xml`, `build.gradle` (Java)
-  - `Gemfile` (Ruby)
-  - `composer.json` (PHP)
-- **Configuration Files**: `tsconfig.json`, `.env.example`, `config.*`, `settings.*`, etc.
-- **Entry Points**: `index.*`, `main.*`, `app.*`, `server.*` in root or primary directories
-- **Source Directories**: Explore `src/`, `lib/`, `app/`, `packages/`, or language-specific conventions
-- **Test Directories**: Check `test/`, `tests/`, `__tests__/`, `spec/` for understanding code structure
-- **Documentation**: Any `docs/` directory or additional `*.md` files
-
-**Expected Output Format**:
-1. **Project Type**: Detected language(s) and framework(s)
-2. **Tech Stack**: Key dependencies and tools identified
-3. **Project Structure**: Directory layout and organization patterns
-4. **Key Components**: Main modules, services, or features discovered
-5. **Development Patterns**: Coding conventions, architectural patterns observed
-6. **Setup Requirements**: Environment variables, build steps, or special configurations needed
-
-**When to Use**:
-- At the start of new coding sessions
-- When switching between different project areas or modules
-- Before implementing new features or making significant changes
-- When you need to understand the full project architecture and patterns
-- When joining a new project or codebase
-
-### Environment Setup
-- Requires Node.js v22 or newer
-- Set `OPENAI_API_KEY` environment variable:
-  - For 03-hello: Uses dotenv to load from parent directory's `.env` file
-  - For 01-basic: Uses dotenv to load from parent directory's `.env` file
-  - For 04-agents: Uses dotenv to load from parent directory's `.env` file
-  - For 02-voice: Create `.env.local` file in the 02-voice directory (already gitignored)
-- 02-voice requires microphone/audio access for voice features
+### Testing & Validation
+- Kill existing servers before starting new ones: `pkill -f "npm run start"` or `lsof -ti:3000 | xargs kill`
+- Verify environment variables are loaded: Check for API key errors in console
+- Test weather functionality (05): Requires `OPENWEATHER_API_KEY` in .env
 
 ## Architecture
 
-This is a workshop repository demonstrating OpenAI's Agents SDK with four progressive examples:
+This is a workshop repository demonstrating OpenAI's Agents SDK with five progressive examples:
 
-### 03-hello
-An interactive chat agent with conversation memory:
-- Interactive command-line chat using readline interface
-- **Conversation Context**: Implements `ConversationContext` interface to maintain chat history
-- **Dynamic Instructions**: Uses `context.context.conversationHistory` to include previous conversation in agent instructions
-- **Context Pattern**: Demonstrates proper usage of `RunContext<T>` for stateful conversations
-- Uses `gpt-4.1-nano` model for conversations
-- Continuous chat loop with graceful exit commands (quit/bye/exit)
+### Project Structure & Capabilities
 
-### 01-basic
-A minimal TypeScript example demonstrating:
+**01-basic**: Minimal TypeScript example
 - Tool definition using Zod schemas
-- Agent creation with the `@openai/agents` SDK
-- Simple text-based interaction with the `gpt-4.1-nano` model
-- Uses `dotenv` to load environment variables from parent directory
-- Includes hardcoded `getWeather` tool for demonstration
+- Single interaction with `gpt-4.1-nano`
+- Hardcoded `getWeather` tool demonstration
 
-### 02-voice
-A Next.js 15 application with real-time voice capabilities:
-- **Client Component** (`src/app/page.tsx`): Manages WebSocket connections, voice sessions, and UI state
-- **Server Action** (`src/app/server/token.ts`): Generates secure session tokens for client authentication
-- **Key Features**:
-  - Real-time voice interaction using `RealtimeAgent` and `RealtimeSession`
-  - Agent handoff capabilities (main agent can hand off to weather agent)
-  - Tool approval flow for interactive confirmation
-  - Conversation history tracking
+**02-voice**: Next.js 15 real-time voice application
+- `RealtimeAgent` and `RealtimeSession` for voice interactions
+- WebSocket-based communication
+- Agent handoff capabilities (main → weather agent)
+- Server Actions for secure token generation
+- Tool approval flow for interactive confirmation
 
-### 04-agents
-A search assistant agent with web search capabilities and **advanced "Running Agents" features**:
-- Interactive command-line chat using readline interface
-- **Web Search Integration**: Uses built-in `webSearchTool()` from OpenAI Agents SDK
-- **Intelligent Tool Usage**: Distinguishes between search queries and general conversation
-- **Conversation Context**: Maintains chat history like 03-hello
-- **Model Configuration**: Uses `gpt-4.1-mini` with temperature 0.45 and auto tool choice
-- **Advanced Runner Features**:
-  - Real-time streaming execution with progress indicators
-  - Custom `Runner` instance for enhanced control
-  - Enhanced error handling for specific agent execution errors (`MaxTurnsExceededError`, `ModelBehaviorError`)
-  - Streaming event processing for better user experience
-- Demonstrates comprehensive OpenAI Agents SDK "Running Agents" patterns
+**03-hello**: Interactive chat with memory
+- `ConversationContext` interface for chat history
+- Dynamic instructions using conversation context
+- Continuous chat loop with graceful exit
 
-### Technology Stack
-- **OpenAI Agents SDK** (`@openai/agents`) - Core agent functionality
-- **Model Context Protocol SDK** (`@modelcontextprotocol/sdk`) - Required dependency for agents-core
-- **Zod** - Runtime type validation for tool parameters
-- **Next.js 15** with App Router - React framework for 02-voice
-- **Tailwind CSS v4** - Styling for the web interface
-- **TypeScript** - Type safety throughout both projects
-- **dotenv** - Environment variable loading for 01-basic
+**04-agents**: Advanced search assistant
+- Built-in `webSearchTool()` integration
+- Custom `Runner` with streaming execution
+- Enhanced error handling (`MaxTurnsExceededError`, `ModelBehaviorError`)
+- Real-time progress indicators
+
+**05-agents-tools**: Multi-tool assistant
+- Weather data via OpenWeatherMap API
+- Web search capabilities
+- Documentation access via Context7 MCP
+- Intelligent tool selection based on query patterns
+- Fallback mechanisms for API failures
 
 ### Key Patterns
-1. **Tool Definition**: Tools are defined using Zod schemas for parameter validation
-2. **Context Management**: Use `RunContext<T>` for stateful conversations - access via `context.context.yourData`
-3. **Voice Communication**: Voice agents use WebSocket connections for real-time interaction
-4. **Authentication**: Session tokens are generated server-side for secure client authentication
-5. **Agent Handoffs**: Specialized agents can be handed off to (e.g., weather agent with specific personality)
-6. **Environment Loading**: CLI projects use dotenv to load from parent `.env`, Next.js uses `.env.local`
 
-## OpenAI Agents SDK Patterns
-
-### Agent Creation
-- **Text Agents**: Use `Agent` class with optional `RunContext<T>` for state management
-- **Voice Agents**: Use `RealtimeAgent` class for voice interactions
-- **Dynamic Instructions**: Pass a function to `instructions` to generate context-aware prompts
-
-### Context Access in Instructions
+**Agent Creation**:
 ```typescript
-// Correct way to access context in instructions
-instructions: (context) => {
-  // Access your data via context.context
-  return `Instructions using ${context.context.yourData}`;
-}
+// Text agent with context
+const agent = new Agent<ConversationContext>({
+  name: "Agent Name",
+  instructions: (context) => {
+    // Access context via context.context.yourData
+    return `Instructions using ${context.context.yourData}`;
+  },
+  model: "gpt-4.1-mini",
+  tools: [tool1, tool2],
+  modelSettings: { temperature: 0.45, toolChoice: "auto" }
+});
 ```
 
-### Running Agents
-- **Basic Text**: `await run(agent, input, { context: yourContextData })`
-- **Voice**: Create `RealtimeSession` with token authentication
-- **Advanced Runner**: Custom `Runner` instance for enhanced control and streaming
-
-### Built-in Tools
-- **webSearchTool()**: Available from `@openai/agents`, used in 04-agents for web search capabilities
-- **Custom Tools**: Defined with Zod schemas for parameter validation (see 01-basic example)
-
-### Model Settings Configuration
+**Tool Definition**:
 ```typescript
-const agent = new Agent({
-  // ... other config
-  modelSettings: { 
-    temperature: 0.45,     // Control randomness (04-agents example)
-    toolChoice: "auto"     // Let model decide when to use tools
+const myTool = () => ({
+  name: "tool_name",
+  description: "What this tool does",
+  parameters: z.object({
+    param: z.string().describe("Parameter description")
+  }),
+  fn: async ({ param }) => {
+    // Implementation
+    return { result: "data" };
   }
 });
 ```
 
-### Advanced Runner Patterns (04-agents)
+**Running Agents**:
 ```typescript
-// Create custom runner
-const runner = new Runner();
+// Basic execution
+const result = await run(agent, input, { context: contextData });
 
-// Streaming execution with progress indicators
+// Advanced with streaming
+const runner = new Runner();
 const streamResult = await runner.run(agent, input, { 
-  context: conversationContext,
+  context: contextData,
   stream: true 
 });
-
-// Process streaming events
-for await (const _ of streamResult) {
-  // Handle real-time progress indicators
-}
-
-// Get final result
-const result = await runner.run(agent, input, { context: conversationContext });
 ```
 
-## Important Notes
+### Environment Configuration
 
-### Environment Variable Handling
-- **03-hello**: Manually loads `.env` from parent directory using dotenv configuration
-- **01-basic**: Manually loads `.env` from parent directory using dotenv configuration
-- **04-agents**: Manually loads `.env` from parent directory using dotenv configuration
-- **02-voice**: Requires `.env.local` file in its own directory (Next.js convention)
-- Never commit `.env` or `.env.local` files - they are gitignored
+**Environment Variables**:
+- CLI projects (01, 03, 04, 05): Load `.env` from parent directory using `dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') })`
+- Next.js (02): Uses `.env.local` in its own directory
+- Required: `OPENAI_API_KEY`
+- Optional: `OPENWEATHER_API_KEY` (for 05-agents-tools weather feature)
+
+**Model Selection**:
+- Simple interactions: `gpt-4.1-nano`
+- Complex tasks: `gpt-4.1-mini` with temperature 0.45
+- Voice: `gpt-4o-realtime-preview-2025-06-03`
+
+### Development Guidelines
+
+**Code Organization**:
+- Keep agent definitions focused and single-purpose
+- Use TypeScript interfaces for context types
+- Implement proper error handling with user-friendly messages
+- Use streaming for better UX in long-running operations
+
+**Tool Development**:
+- Define clear, descriptive tool names and descriptions
+- Use Zod for robust parameter validation
+- Return structured data that agents can interpret
+- Include error handling with helpful fallback messages
+
+**Context Management**:
+- Maintain conversation history in context objects
+- Limit history size to prevent token overflow
+- Access context data via `context.context` in instructions
+- Pass context consistently through agent runs
 
 ### Common Issues & Solutions
-- **MCP SDK Error**: Install `@modelcontextprotocol/sdk` in 02-voice if missing
-- **OPENAI_API_KEY Error in 02-voice**: Create `.env.local` file in 02-voice directory
-- **Port Conflicts**: Next.js will automatically use next available port (e.g., 3001 if 3000 in use)
 
-### Model Usage
-- **03-hello**: Uses `gpt-4.1-nano` for interactive chat conversations
-- **01-basic**: Uses `gpt-4.1-nano` for text interactions
-- **04-agents**: Uses `gpt-4.1-mini` with temperature 0.45 for search operations
-- **02-voice**: Uses `gpt-4o-realtime-preview-2025-06-03` for voice interactions
+**Port Conflicts**: 
+- Next.js auto-selects next available port if 3000 is taken
+- Kill existing processes before starting new ones
 
-## Development Guidelines
+**API Key Errors**:
+- CLI projects: Ensure `.env` exists in parent directory
+- Next.js: Create `.env.local` in 02-voice directory
+- Verify keys are valid and have appropriate permissions
 
-### Server Management
-- After making changes, ALWAYS restart the server for testing
-- Kill all existing related servers before starting new ones to avoid port conflicts
-- Use `pkill -f` or `lsof -ti:PORT | xargs kill` to clean up running processes
+**MCP SDK Missing**:
+- Run `npm install @modelcontextprotocol/sdk` if import errors occur
+- This is a required peer dependency for agents-core
 
-### Code Development Principles
-- **Iterate, don't recreate**: Always look for existing code to build upon instead of creating new implementations
-- **Preserve patterns**: Do not drastically change established patterns - iterate on existing ones first
-- **Prefer simplicity**: Choose simple solutions over complex ones
-- **Avoid duplication**: Check for similar functionality elsewhere in the codebase before implementing
-- **Environment awareness**: Write code that considers dev, test, and prod environments
-
-### Change Management
-- Only make changes that are explicitly requested or clearly related to the task
-- When fixing bugs, exhaust all options with existing implementation before introducing new patterns
-- If new patterns are introduced, remove old implementations to prevent duplicate logic
-- Focus only on code areas relevant to the task - avoid unrelated changes
-- Avoid major architectural changes to proven features unless explicitly instructed
-
-### Code Organization
-- Keep files under 200-300 lines - refactor when approaching this limit
-- Maintain a clean and organized codebase structure
-- Avoid writing one-time scripts in permanent files
-- Write thorough tests for all major functionality
-
-### Data Handling
-- Never mock data for dev or prod environments - only use mocking in tests
-- Never add stubbing or fake data patterns that affect dev/prod environments
-- Use real data flows for development and production code
+**Agent Errors**:
+- `MaxTurnsExceededError`: Simplify query or increase turn limit
+- `ModelBehaviorError`: Retry or rephrase request
+- Tool execution failures: Check API keys and network connectivity
 
 ## External Resources
 
