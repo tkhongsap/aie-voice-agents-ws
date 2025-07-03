@@ -10,10 +10,14 @@ import { config, APP_MESSAGES } from '../config';
 /**
  * Context7 MCP server configuration
  */
-export const context7ServerConfig = {
+export const context7ServerConfig = config.mcpServers.context7 ? {
   name: config.mcpServers.context7.name,
   command: config.mcpServers.context7.command,
   url: config.mcpServers.context7.url,
+} : {
+  name: 'Context7 Documentation Server (Not Available)',
+  command: '',
+  url: 'https://context7.upstash.com',
 };
 
 /**

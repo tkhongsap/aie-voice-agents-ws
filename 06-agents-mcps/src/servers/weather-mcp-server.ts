@@ -146,10 +146,14 @@ export class WeatherMCPServer {
 /**
  * Weather MCP server configuration
  */
-export const weatherServerConfig = {
+export const weatherServerConfig = config.mcpServers.weather ? {
   name: config.mcpServers.weather.name,
   command: config.mcpServers.weather.command,
   url: config.mcpServers.weather.url,
+} : {
+  name: 'Weather MCP Server (Not Available)',
+  command: '',
+  url: 'https://api.openweathermap.org',
 };
 
 /**

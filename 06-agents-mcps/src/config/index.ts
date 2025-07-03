@@ -14,6 +14,7 @@ export const ENV_VARS = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENWEATHER_API_KEY: process.env.OPENWEATHER_API_KEY,
   AQICN_API_KEY: process.env.AQICN_API_KEY,
+  CONTEXT7_API_KEY: process.env.CONTEXT7_API_KEY,
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: process.env.PORT || '3000',
 } as const;
@@ -26,14 +27,39 @@ export const AGENT_CONFIG = {
   MAX_CONVERSATION_HISTORY: 10,
 } as const;
 
-// MCP Server configurations
-export const MCP_CONFIG = {
-  CONTEXT7_SERVER: {
-    name: 'Context7 Documentation Server',
-    command: 'npx -y @smithery/cli@latest run @upstash/context7-mcp --key 7c6c26f1-c7ec-4cf0-96a8-1a4e48004d4e',
-    url: 'https://context7.upstash.com',
-  },
-} as const;
+// MCP Server configurations (conditional based on API key availability)
+export const getMcpConfig = () => {
+  const config: any = {};
+  
+  if (ENV_VARS.OPENWEATHER_API_KEY) {
+    config.WEATHER_SERVER = {
+      name: 'Weather MCP Server',
+      command: `npx -y @smithery/cli@latest run @weather/mcp-server --key ${ENV_VARS.OPENWEATHER_API_KEY}`,
+      url: 'https://api.openweathermap.org',
+    };
+  }
+  
+  if (ENV_VARS.AQICN_API_KEY) {
+    config.AIR_QUALITY_SERVER = {
+      name: 'Air Quality MCP Server',
+      command: `npx -y @smithery/cli@latest run @aqicn/mcp-server --key ${ENV_VARS.AQICN_API_KEY}`,
+      url: 'https://api.waqi.info',
+    };
+  }
+  
+  if (ENV_VARS.CONTEXT7_API_KEY) {
+    config.CONTEXT7_SERVER = {
+      name: 'Context7 Documentation Server',
+      command: `npx -y @smithery/cli@latest run @upstash/context7-mcp --key ${ENV_VARS.CONTEXT7_API_KEY}`,
+      url: 'https://context7.upstash.com',
+    };
+  }
+  
+  return config;
+};
+
+// Legacy export for backward compatibility
+export const MCP_CONFIG = getMcpConfig();
 
 // Application messages
 export const APP_MESSAGES = {
@@ -92,6 +118,7 @@ export interface AppConfig {
   openaiApiKey: string;
   weatherApiKey: string | undefined;
   airQualityApiKey: string | undefined;
+  context7ApiKey: string | undefined;
   port: number;
   environment: string;
   agent: {
@@ -101,7 +128,17 @@ export interface AppConfig {
     maxConversationHistory: number;
   };
   mcpServers: {
-    context7: {
+    weather?: {
+      name: string;
+      command: string;
+      url: string;
+    };
+    airQuality?: {
+      name: string;
+      command: string;
+      url: string;
+    };
+    context7?: {
       name: string;
       command: string;
       url: string;
@@ -114,6 +151,7 @@ export const config: AppConfig = {
   openaiApiKey: ENV_VARS.OPENAI_API_KEY || '',
   weatherApiKey: ENV_VARS.OPENWEATHER_API_KEY,
   airQualityApiKey: ENV_VARS.AQICN_API_KEY,
+  context7ApiKey: ENV_VARS.CONTEXT7_API_KEY,
   port: parseInt(ENV_VARS.PORT, 10),
   environment: ENV_VARS.NODE_ENV,
   agent: {
@@ -123,28 +161,42 @@ export const config: AppConfig = {
     maxConversationHistory: AGENT_CONFIG.MAX_CONVERSATION_HISTORY,
   },
   mcpServers: {
+    weather: MCP_CONFIG.WEATHER_SERVER,
+    airQuality: MCP_CONFIG.AIR_QUALITY_SERVER,
     context7: MCP_CONFIG.CONTEXT7_SERVER,
   },
 };
 
 // Validation helper
-export const validateConfig = (): { isValid: boolean; errors: string[] } => {
+export const validateConfig = (): { 
+  isValid: boolean; 
+  errors: string[]; 
+  warnings: string[] 
+} => {
   const errors: string[] = [];
+  const warnings: string[] = [];
   
+  // Required keys
   if (!config.openaiApiKey) {
     errors.push('OPENAI_API_KEY is required');
   }
   
+  // Optional keys
   if (!config.weatherApiKey) {
-    errors.push('OPENWEATHER_API_KEY is recommended for weather functionality');
+    warnings.push('OPENWEATHER_API_KEY is recommended for weather functionality');
   }
   
   if (!config.airQualityApiKey) {
-    errors.push('AQICN_API_KEY is recommended for air quality functionality');
+    warnings.push('AQICN_API_KEY is recommended for air quality functionality');
+  }
+  
+  if (!config.context7ApiKey) {
+    warnings.push('CONTEXT7_API_KEY is recommended for documentation functionality');
   }
   
   return {
     isValid: errors.length === 0,
     errors,
+    warnings,
   };
 }; 
