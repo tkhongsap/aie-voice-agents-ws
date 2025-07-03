@@ -7,6 +7,8 @@ import { Agent, Runner } from '@openai/agents';
 import { buildInstructions, getInstructionBuilder } from './instructions';
 import { createInstructionsContext, mcpConfigUtils, type MCPAgentConfig } from './agent-config';
 import { mcpServerManager, context7Server } from '../servers';
+import { isContext7ServerConnected } from '../servers/context7-mcp-server';
+import { getToolsForCapabilities } from '../tools';
 import type { 
   ConversationContext, 
   InstructionsContext, 
@@ -64,14 +66,13 @@ export const createMCPAgent = (
   
   const mcpServers = [];
   
-  // Add Context7 server if documentation is enabled
-  if (enabledServers.documentation) {
+  // Add Context7 server if documentation is enabled and server is connected
+  if (enabledServers.documentation && isContext7ServerConnected()) {
     mcpServers.push(context7Server);
   }
   
-  // Note: Weather and Air Quality servers are handled differently
-  // since they're custom implementations, not external MCP servers
-  // They provide their functionality through the agent's instructions
+  // Get tools for enabled capabilities
+  const tools = getToolsForCapabilities(enabledServers);
   
   // Get instruction builder
   const instructionBuilder = getInstructionBuilder(opts.instructionType);
@@ -91,16 +92,16 @@ export const createMCPAgent = (
       const instructionsContext: InstructionsContext = {
         capabilities: enabledServers,
         mcpServers: {
-          weather: serverStatuses.weather || { name: 'Weather', connected: false },
-          airQuality: serverStatuses.airQuality || { name: 'Air Quality', connected: false },
-          context7: serverStatuses.context7 || { name: 'Context7', connected: false },
+          weather: { name: 'Weather Direct Tool', connected: enabledServers.weather || false },
+          airQuality: { name: 'Air Quality Direct Tool', connected: enabledServers.airQuality || false },
+          context7: serverStatuses.context7 || { name: 'Context7 MCP Server', connected: false },
         },
       };
       
       return instructionBuilder(instructionsContext);
     },
     model: opts.model || agentConfig.model,
-    tools: [], // MCP servers provide tools, so we don't need to add them here
+    tools: tools, // Include direct service tools
     modelSettings: {
       temperature: agentConfig.temperature,
       toolChoice: agentConfig.toolChoice,

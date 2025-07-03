@@ -12,39 +12,48 @@ import type { InstructionsContext } from '../types';
 export const buildInstructions = (context: InstructionsContext): string => {
   const { capabilities, mcpServers, userQuery } = context;
   
-  let instructions = `You are an advanced AI assistant with access to MCP (Model Context Protocol) servers for specialized data retrieval.
+  let instructions = `You are an advanced AI assistant with access to both direct tools and MCP (Model Context Protocol) servers for specialized data retrieval.
 
-## Available MCP Servers
+## Architecture Overview
+
+This system uses a hybrid approach:
+- **Direct Tools**: Weather and Air Quality (fast, integrated tools)
+- **MCP Servers**: Documentation (external service integration)
+
+## Available Capabilities
 
 `;
 
-  // Weather MCP Server
+  // Weather Direct Tool
   if (capabilities.weather && mcpServers.weather.connected) {
-    instructions += `### 🌤️ Weather MCP Server (${mcpServers.weather.connected ? 'Connected' : 'Disconnected'})
+    instructions += `### 🌤️ Weather Data (Direct Tool Integration)
 - Get current weather data for any location worldwide
 - Provides temperature, humidity, wind speed, pressure, visibility, and more
-- Capabilities: ${mcpServers.weather.capabilities?.join(', ') || 'weather data'}
+- Fast response via direct API integration to OpenWeatherMap
+- Type: Direct tool, not MCP server
 
 `;
   }
 
-  // Air Quality MCP Server
+  // Air Quality Direct Tool
   if (capabilities.airQuality && mcpServers.airQuality.connected) {
-    instructions += `### 🌬️ Air Quality MCP Server (${mcpServers.airQuality.connected ? 'Connected' : 'Disconnected'})
+    instructions += `### 🌬️ Air Quality Data (Direct Tool Integration)
 - Get real-time air quality data and AQI (Air Quality Index)
 - Provides pollutant levels (PM2.5, PM10, NO2, SO2, CO, O3)
 - Health implications and recommendations
-- Capabilities: ${mcpServers.airQuality.capabilities?.join(', ') || 'air quality data'}
+- Fast response via direct API integration to AQICN
+- Type: Direct tool, not MCP server
 
 `;
   }
 
   // Context7 Documentation MCP Server
   if (capabilities.documentation && mcpServers.context7.connected) {
-    instructions += `### 📚 Context7 Documentation MCP Server (${mcpServers.context7.connected ? 'Connected' : 'Disconnected'})
+    instructions += `### 📚 Context7 Documentation (True MCP Server Integration)
 - Access latest documentation for libraries and frameworks
 - Get up-to-date API references and guides
 - Supports React, Next.js, OpenAI, LangChain, TypeScript, and more
+- Type: True MCP server via Smithery CLI
 - Capabilities: ${mcpServers.context7.capabilities?.join(', ') || 'documentation lookup'}
 
 `;

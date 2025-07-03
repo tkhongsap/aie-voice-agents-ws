@@ -5,15 +5,17 @@
 
 import type { MCPServerConfig, MCPServerStatus } from '../types';
 
-// Export all MCP servers
-export * from './weather-mcp-server';
-export * from './air-quality-mcp-server';
+// Export MCP servers
 export * from './context7-mcp-server';
 
 // Import server instances
-import { weatherMCPServer, initializeWeatherMCPServer } from './weather-mcp-server';
-import { airQualityMCPServer, initializeAirQualityMCPServer } from './air-quality-mcp-server';
-import { context7MCPServer, initializeContext7MCPServer } from './context7-mcp-server';
+import { 
+  context7Server, 
+  initializeContext7Server, 
+  getContext7ServerStatus,
+  isContext7ServerConnected,
+  disconnectContext7Server 
+} from './context7-mcp-server';
 
 /**
  * MCP Server Manager
@@ -25,15 +27,11 @@ export class MCPServerManager {
   private initializers: Map<string, () => Promise<any>> = new Map();
 
   constructor() {
-    // Register all MCP servers
-    this.servers.set('weather', weatherMCPServer);
-    this.servers.set('airQuality', airQualityMCPServer);
-    this.servers.set('context7', context7MCPServer);
+    // Register MCP servers (only Context7 is a true MCP server)
+    this.servers.set('context7', context7Server);
 
     // Register initializers
-    this.initializers.set('weather', initializeWeatherMCPServer);
-    this.initializers.set('airQuality', initializeAirQualityMCPServer);
-    this.initializers.set('context7', initializeContext7MCPServer);
+    this.initializers.set('context7', initializeContext7Server);
   }
 
   /**
@@ -51,21 +49,27 @@ export class MCPServerManager {
     for (const [name, initializer] of this.initializers) {
       try {
         const result = await initializer();
-                 const status: MCPServerStatus = {
-           name: result.server.getStatus().name,
-           connected: result.connected,
-           capabilities: result.server.getStatus().capabilities,
-         };
+        
+        let status: MCPServerStatus;
+        if (name === 'context7') {
+          // Use the simplified Context7 server status
+          const context7Status = getContext7ServerStatus();
+          status = {
+            name: context7Status.name,
+            connected: context7Status.connected,
+            capabilities: context7Status.capabilities,
+            lastConnected: context7Status.lastConnected,
+            lastError: context7Status.lastError,
+          };
+        } else {
+          // Fallback for other servers (though we only have Context7 now)
+          status = {
+            name: name,
+            connected: result.connected,
+          };
+        }
          
-         if (result.connected) {
-           status.lastConnected = new Date();
-         }
-         
-         if (result.error) {
-           status.lastError = result.error;
-         }
-         
-         this.statuses.set(name, status);
+        this.statuses.set(name, status);
 
         if (result.connected) {
           connected.push(name);
@@ -100,19 +104,25 @@ export class MCPServerManager {
 
     try {
       const result = await initializer();
-             const status: MCPServerStatus = {
-         name: result.server.getStatus().name,
-         connected: result.connected,
-         capabilities: result.server.getStatus().capabilities,
-       };
-       
-       if (result.connected) {
-         status.lastConnected = new Date();
-       }
-       
-       if (result.error) {
-         status.lastError = result.error;
-       }
+      
+      let status: MCPServerStatus;
+      if (serverName === 'context7') {
+        // Use the simplified Context7 server status
+        const context7Status = getContext7ServerStatus();
+        status = {
+          name: context7Status.name,
+          connected: context7Status.connected,
+          capabilities: context7Status.capabilities,
+          lastConnected: context7Status.lastConnected,
+          lastError: context7Status.lastError,
+        };
+      } else {
+        // Fallback for other servers
+        status = {
+          name: serverName,
+          connected: result.connected,
+        };
+      }
        
        this.statuses.set(serverName, status);
 
@@ -139,9 +149,13 @@ export class MCPServerManager {
     const failed: string[] = [];
     const errors: Record<string, string> = {};
 
-    for (const [name, server] of this.servers) {
+    for (const [name] of this.servers) {
       try {
-        const success = await server.disconnect();
+        let success = false;
+        if (name === 'context7') {
+          success = await disconnectContext7Server();
+        }
+        
         if (success) {
           disconnected.push(name);
           this.statuses.set(name, {
@@ -164,13 +178,16 @@ export class MCPServerManager {
    * Disconnect a specific MCP server
    */
   async disconnectServer(serverName: string): Promise<boolean> {
-    const server = this.servers.get(serverName);
-    if (!server) {
+    if (!this.servers.has(serverName)) {
       throw new Error(`Server '${serverName}' not found`);
     }
 
     try {
-      const success = await server.disconnect();
+      let success = false;
+      if (serverName === 'context7') {
+        success = await disconnectContext7Server();
+      }
+      
       if (success) {
         this.statuses.set(serverName, {
           ...this.statuses.get(serverName)!,
@@ -213,6 +230,9 @@ export class MCPServerManager {
    * Check if a server is connected
    */
   isServerConnected(serverName: string): boolean {
+    if (serverName === 'context7') {
+      return isContext7ServerConnected();
+    }
     const status = this.statuses.get(serverName);
     return status?.connected || false;
   }
@@ -256,9 +276,8 @@ export class MCPServerManager {
    */
   getAllServerConfigs(): Record<string, MCPServerConfig> {
     const configs: Record<string, MCPServerConfig> = {};
-    for (const [name, server] of this.servers) {
-      configs[name] = server.getConfig();
-    }
+    // For now, we only have context7, and it doesn't expose getConfig()
+    // This could be enhanced to return actual config if needed
     return configs;
   }
 }
@@ -348,16 +367,15 @@ ${error}`.trim();
  * Export individual server instances for direct access
  */
 export const servers = {
-  weather: weatherMCPServer,
-  airQuality: airQualityMCPServer,
-  context7: context7MCPServer,
+  context7: context7Server,
 };
+
+// Export the context7Server for agent use
+export { context7Server };
 
 /**
  * Export server initializers
  */
 export const serverInitializers = {
-  weather: initializeWeatherMCPServer,
-  airQuality: initializeAirQualityMCPServer,
-  context7: initializeContext7MCPServer,
+  context7: initializeContext7Server,
 }; 

@@ -23,9 +23,7 @@ export interface ConversationContext {
     timestamp: Date;
   }>;
   mcpServers: {
-    weather: MCPServerConfig;
     context7: MCPServerConfig;
-    airQuality: MCPServerConfig;
   };
   capabilities: {
     weather: boolean;

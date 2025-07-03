@@ -4,6 +4,7 @@
  */
 
 import * as readline from 'readline';
+import { run } from '@openai/agents';
 import { APP_MESSAGES, ERROR_MESSAGES, validateConfig } from '../config';
 import { mcpAgentFactory } from '../agent';
 import { mcpServerUtils } from '../servers';
@@ -19,17 +20,19 @@ export class MCPChatInterface {
   private serverStatuses: Record<string, MCPServerStatus> = {};
 
   constructor() {
-    this.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
     this.chatSession = {
       id: `mcp-chat-${Date.now()}`,
       messages: [],
       startTime: new Date(),
       mcpServersConnected: [],
     };
+  }
+
+  private createReadlineInterface() {
+    return readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
   }
 
   /**
@@ -48,6 +51,7 @@ export class MCPChatInterface {
       // Initialize MCP servers
       console.log('🔌 Initializing MCP servers...');
       const initResult = await mcpServerUtils.initializeAllServers();
+      console.log('🔌 MCP server initialization completed.');
       
       this.serverStatuses = mcpServerUtils.getManager().getAllServerStatuses();
       this.chatSession.mcpServersConnected = initResult.connected;
@@ -64,8 +68,16 @@ export class MCPChatInterface {
         });
       }
 
-      // Create agent
-      this.agent = mcpAgentFactory.create();
+      // Create agent AFTER MCP servers are initialized
+      console.log('🤖 Creating agent...');
+      this.agent = mcpAgentFactory.create({
+        mcpServers: {
+          weather: true,
+          airQuality: true,
+          documentation: initResult.connected.includes('context7'),
+        },
+      });
+      console.log('🤖 Agent created successfully.');
 
       // Display welcome message
       console.log('\n' + APP_MESSAGES.WELCOME);
@@ -77,6 +89,8 @@ export class MCPChatInterface {
       console.log(APP_MESSAGES.QUIT_INSTRUCTIONS);
 
       // Start chat loop
+      console.log('💬 Starting chat loop...');
+      this.rl = this.createReadlineInterface();
       await this.chatLoop();
 
     } catch (error: any) {
@@ -86,41 +100,55 @@ export class MCPChatInterface {
   }
 
   /**
-   * Main chat loop
+   * Main chat loop using recursive pattern (similar to 03-hello)
    */
   private async chatLoop(): Promise<void> {
-    while (true) {
-      const userInput = await this.getUserInput();
-
-      // Check for quit commands
-      if (this.isQuitCommand(userInput)) {
-        console.log(APP_MESSAGES.GOODBYE);
-        break;
-      }
-
-      // Handle empty input
-      if (!userInput.trim()) {
-        continue;
-      }
-
-      // Process user message
-      await this.processUserMessage(userInput);
-    }
-
-    // Cleanup
-    await this.cleanup();
-  }
-
-  /**
-   * Get user input
-   */
-  private getUserInput(): Promise<string> {
     return new Promise((resolve) => {
-      this.rl.question('You: ', (answer) => {
-        resolve(answer);
+      this.rl.question('You: ', async (userInput) => {
+        const trimmedInput = userInput.trim().toLowerCase();
+        
+        // Check for exit conditions
+        if (this.isQuitCommand(trimmedInput)) {
+          console.log(APP_MESSAGES.GOODBYE);
+          await this.cleanup();
+          resolve();
+          return;
+        }
+
+        // Skip empty inputs
+        if (!userInput.trim()) {
+          await this.chatLoop();
+          resolve();
+          return;
+        }
+
+        try {
+          // Process user message
+          await this.processUserMessage(userInput);
+          
+          // Recreate readline interface before continuing
+          this.rl.close();
+          this.rl = this.createReadlineInterface();
+          
+          // Continue the chat loop
+          await this.chatLoop();
+          resolve();
+        } catch (error: any) {
+          console.error('❌ Sorry, there was an error processing your message:', error.message);
+          console.log('Please try again.\n');
+          
+          // Recreate readline interface before continuing
+          this.rl.close();
+          this.rl = this.createReadlineInterface();
+          
+          // Continue the chat loop even after an error
+          await this.chatLoop();
+          resolve();
+        }
       });
     });
   }
+
 
   /**
    * Process user message
@@ -140,13 +168,11 @@ export class MCPChatInterface {
          sessionId: this.chatSession.id,
          history: this.chatSession.messages,
          mcpServers: {
-           weather: { name: 'Weather', command: 'weather-mcp-server', url: 'http://localhost:8001' },
            context7: { name: 'Context7', command: 'context7-mcp-server', url: 'https://context7.upstash.com' },
-           airQuality: { name: 'Air Quality', command: 'air-quality-mcp-server', url: 'http://localhost:8002' },
          },
          capabilities: {
-           weather: this.serverStatuses.weather?.connected || false,
-           airQuality: this.serverStatuses.airQuality?.connected || false,
+           weather: true, // Always available via direct tool
+           airQuality: true, // Always available via direct tool
            documentation: this.serverStatuses.context7?.connected || false,
          },
        };
@@ -155,15 +181,15 @@ export class MCPChatInterface {
       console.log(APP_MESSAGES.PROCESSING);
 
       // Get agent response
-      const response = await this.agent.run(message, context);
+      const result = await run(this.agent, message, { context });
 
       // Display response
-      console.log('\nAssistant:', response);
+      console.log('\nAssistant:', result.finalOutput);
 
       // Add assistant message to session
       this.chatSession.messages.push({
         role: 'assistant',
-        content: response,
+        content: result.finalOutput,
         timestamp: new Date(),
         metadata: {
           mcpServersUsed: this.chatSession.mcpServersConnected,
@@ -190,23 +216,14 @@ export class MCPChatInterface {
   private displayCapabilities(): void {
     console.log('\n🔧 Available Capabilities:');
     
-    if (this.serverStatuses.weather?.connected) {
-      console.log('  🌤️  Weather data (via MCP server)');
-    }
-    
-    if (this.serverStatuses.airQuality?.connected) {
-      console.log('  🌬️  Air quality data (via MCP server)');
-    }
+    console.log('  🌤️  Weather data (via direct API integration)');
+    console.log('  🌬️  Air quality data (via direct API integration)');
     
     if (this.serverStatuses.context7?.connected) {
       console.log('  📚 Documentation lookup (via Context7 MCP server)');
     }
 
     console.log('  💬 General conversation');
-    
-    if (Object.values(this.serverStatuses).every(status => !status?.connected)) {
-      console.log('  ⚠️  No MCP servers connected - limited functionality');
-    }
     
     console.log('');
   }

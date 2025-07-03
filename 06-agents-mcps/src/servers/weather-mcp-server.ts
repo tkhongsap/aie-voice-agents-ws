@@ -146,7 +146,7 @@ export class WeatherMCPServer {
 /**
  * Weather MCP server configuration
  */
-export const weatherServerConfig: MCPServerConfig = {
+export const weatherServerConfig = {
   name: config.mcpServers.weather.name,
   command: config.mcpServers.weather.command,
   url: config.mcpServers.weather.url,

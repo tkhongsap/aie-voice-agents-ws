@@ -28,20 +28,10 @@ export const AGENT_CONFIG = {
 
 // MCP Server configurations
 export const MCP_CONFIG = {
-  WEATHER_SERVER: {
-    name: 'Weather MCP Server',
-    command: 'node src/servers/weather-mcp-server.js',
-    url: 'http://localhost:8001',
-  },
   CONTEXT7_SERVER: {
     name: 'Context7 Documentation Server',
     command: 'npx -y @smithery/cli@latest run @upstash/context7-mcp --key 7c6c26f1-c7ec-4cf0-96a8-1a4e48004d4e',
     url: 'https://context7.upstash.com',
-  },
-  AIR_QUALITY_SERVER: {
-    name: 'Air Quality MCP Server',
-    command: 'node src/servers/air-quality-mcp-server.js',
-    url: 'http://localhost:8002',
   },
 } as const;
 
@@ -111,17 +101,7 @@ export interface AppConfig {
     maxConversationHistory: number;
   };
   mcpServers: {
-    weather: {
-      name: string;
-      command: string;
-      url: string;
-    };
     context7: {
-      name: string;
-      command: string;
-      url: string;
-    };
-    airQuality: {
       name: string;
       command: string;
       url: string;
@@ -143,9 +123,7 @@ export const config: AppConfig = {
     maxConversationHistory: AGENT_CONFIG.MAX_CONVERSATION_HISTORY,
   },
   mcpServers: {
-    weather: MCP_CONFIG.WEATHER_SERVER,
     context7: MCP_CONFIG.CONTEXT7_SERVER,
-    airQuality: MCP_CONFIG.AIR_QUALITY_SERVER,
   },
 };
 

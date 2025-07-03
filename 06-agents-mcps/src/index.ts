@@ -31,14 +31,22 @@ async function main() {
 }
 
 // Handle graceful shutdown
-process.on('SIGINT', () => {
-  console.log('\n👋 Goodbye!');
-  process.exit(0);
+let isShuttingDown = false;
+
+process.on('SIGINT', async () => {
+  if (!isShuttingDown) {
+    isShuttingDown = true;
+    console.log('\n👋 Received shutdown signal. Goodbye!');
+    process.exit(0);
+  }
 });
 
-process.on('SIGTERM', () => {
-  console.log('\n👋 Goodbye!');
-  process.exit(0);
+process.on('SIGTERM', async () => {
+  if (!isShuttingDown) {
+    isShuttingDown = true;
+    console.log('\n👋 Received shutdown signal. Goodbye!');
+    process.exit(0);
+  }
 });
 
 // Start the application
