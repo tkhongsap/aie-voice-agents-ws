@@ -6,8 +6,8 @@ An advanced AI assistant that combines web search capabilities, live weather dat
 
 - 🌤️ **Live Weather Data** - Get current weather information for any location worldwide
 - 🔍 **Web Search** - Search the internet for information on any topic
-- � **Latest Documentation** - Access up-to-date library and framework docs via Context7 MCP
-- �💬 **Intelligent Tool Selection** - Automatically determines when to use tools vs. general conversation
+- 📚 **Latest Documentation** - Access up-to-date library and framework docs via Context7 MCP
+- 💬 **Intelligent Tool Selection** - Automatically determines when to use tools vs. general conversation
 - 🔄 **Streaming Responses** - Real-time response processing with progress indicators
 - 📝 **Conversation History** - Maintains context across the conversation
 
