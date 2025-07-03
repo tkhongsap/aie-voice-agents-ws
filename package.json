@@ -5,7 +5,8 @@
     "start:02": "npm run dev --prefix 02-voice",
     "start:03": "npm run start --prefix 03-hello",
     "start:04": "npm run start --prefix 04-agents",
-    "install": "npm install --prefix 01-basic && npm install --prefix 02-voice && npm install --prefix 03-hello && npm install --prefix 04-agents"
+    "start:05": "npm run start --prefix 05-agents-tools",
+    "install": "npm install --prefix 01-basic && npm install --prefix 02-voice && npm install --prefix 03-hello && npm install --prefix 04-agents && npm install --prefix 05-agents-tools"
   },
   "dependencies": {
     "@openai/agents": "^0.0.10"
