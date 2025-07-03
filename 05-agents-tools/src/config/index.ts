@@ -13,6 +13,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '..', '.env') });
 export const ENV_VARS = {
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENWEATHER_API_KEY: process.env.OPENWEATHER_API_KEY,
+  CONTEXT7_API_KEY: process.env.CONTEXT7_API_KEY,
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: process.env.PORT || '3000',
 } as const;
@@ -36,7 +37,7 @@ export const AGENT_CONFIG = {
 export const MCP_CONFIG = {
   CONTEXT7_SERVER: {
     NAME: 'Context7 Documentation Server',
-    COMMAND: 'npx -y @smithery/cli@latest run @upstash/context7-mcp --key 7c6c26f1-c7ec-4cf0-96a8-1a4e48004d4e'
+    COMMAND: `npx -y @smithery/cli@latest run @upstash/context7-mcp --key ${ENV_VARS.CONTEXT7_API_KEY || 'your_context7_api_key_here'}`
   }
 } as const;
 
@@ -108,6 +109,7 @@ export const TOOL_DESCRIPTIONS = {
 export interface AppConfig {
   openaiApiKey: string;
   weatherApiKey: string | undefined;
+  context7ApiKey: string | undefined;
   port: number;
   environment: string;
   agent: {
@@ -127,6 +129,7 @@ export interface AppConfig {
 export const config: AppConfig = {
   openaiApiKey: ENV_VARS.OPENAI_API_KEY || '',
   weatherApiKey: ENV_VARS.OPENWEATHER_API_KEY,
+  context7ApiKey: ENV_VARS.CONTEXT7_API_KEY,
   port: parseInt(ENV_VARS.PORT, 10),
   environment: ENV_VARS.NODE_ENV,
   agent: {
@@ -152,6 +155,10 @@ export const validateConfig = (): { isValid: boolean; errors: string[] } => {
   
   if (!config.weatherApiKey) {
     errors.push('OPENWEATHER_API_KEY is recommended for weather functionality');
+  }
+  
+  if (!config.context7ApiKey) {
+    errors.push('CONTEXT7_API_KEY is recommended for documentation functionality');
   }
   
   return {

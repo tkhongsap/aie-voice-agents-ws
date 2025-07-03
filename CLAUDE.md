@@ -24,8 +24,9 @@ From individual project directories:
 ### Testing & Validation
 - Kill existing servers before starting new ones: `pkill -f "npm run start"` or `lsof -ti:3000 | xargs kill`
 - Verify environment variables are loaded: Check for API key errors in console
-- Test weather functionality (05): Requires `OPENWEATHER_API_KEY` in .env
+- Test weather functionality (05, 06): Requires `OPENWEATHER_API_KEY` in .env
 - Test air quality functionality (06): Requires `AQICN_API_KEY` in .env
+- Test documentation functionality (05, 06): Requires `CONTEXT7_API_KEY` in .env
 - No formal testing framework configured - this is a workshop environment focused on interactive development
 
 ## Architecture
@@ -125,6 +126,7 @@ const streamResult = await runner.run(agent, input, {
 - Required: `OPENAI_API_KEY`
 - Optional: `OPENWEATHER_API_KEY` (for 05-agents-tools and 06-agents-mcps weather features)
 - Optional: `AQICN_API_KEY` (for 06-agents-mcps air quality feature)
+- Optional: `CONTEXT7_API_KEY` (for 05-agents-tools and 06-agents-mcps documentation features)
 
 **Model Selection**:
 - Simple interactions: `gpt-4.1-nano`
@@ -188,7 +190,7 @@ const streamResult = await runner.run(agent, input, {
 - Server connection failures: Check API keys and network connectivity
 - Server timeout errors: Increase timeout values in server configuration
 - Invalid responses: Verify API key permissions and rate limits
-- Missing servers: Ensure required environment variables are set (OPENWEATHER_API_KEY, AQICN_API_KEY)
+- Missing servers: Ensure required environment variables are set (OPENWEATHER_API_KEY, AQICN_API_KEY, CONTEXT7_API_KEY)
 
 ## Quick Reference
 
