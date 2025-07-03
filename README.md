@@ -22,30 +22,96 @@ npm install
 
 This will automatically install the [OpenAI Agents SDK](https://openai.github.io/openai-agents-js), [`zod`](https://zod.dev) and TypeScript for you.
 
-## Project structure
+## Project Structure
 
-During the workshop we will use two projects.
+This workshop contains 5 progressive modules that build from basic text agents to advanced voice agents with multiple tools:
 
-We will start off in [01-basic](01-basic/) where we will create a basic text-based agent to familiarize yourself with the [OpenAI Agents SDK for TypeScript](https://openai.github.io/openai-agents-js/).
+### [01-basic](01-basic/) - Basic Agent with Tools
+A simple text-based agent to familiarize yourself with the [OpenAI Agents SDK for TypeScript](https://openai.github.io/openai-agents-js/).
+- Simple weather tool integration
+- Basic agent configuration
+- Introduction to tools and execution
 
-Afterwards we will use the Next.js app in [02-voice](02-voice/) to build our voice agent using the same SDK. We'll be using Next.js to have a framework where we can have both server-side code and client-code easily accessible but the SDK is compatible with any frontend framework.
+### [02-voice](02-voice/) - Voice Agent with Next.js
+A Next.js application for building voice agents using the same SDK.
+- Voice input/output capabilities
+- Web-based interface
+- Real-time voice processing
+- Client-server architecture
 
-## Running your code
+### [03-hello](03-hello/) - Interactive Chat Assistant
+An enhanced text-based assistant with conversation capabilities.
+- Interactive chat interface
+- Conversation history and context
+- Continuous conversation loop
+- Enhanced user experience
+
+### [04-agents](04-agents/) - Advanced Search Agent
+A sophisticated agent with web search capabilities and advanced features.
+- Web search integration
+- Streaming responses
+- Enhanced error handling
+- Smart tool usage decisions
+- Advanced conversation management
+
+### [05-agents-tools](05-agents-tools/) - Multi-Tool Assistant
+The most advanced module featuring multiple integrated tools and services.
+- 🌤️ Live weather data via OpenWeatherMap API
+- 🔍 Web search capabilities
+- 📚 Latest documentation access via Context7 MCP
+- 💬 Intelligent tool selection
+- 🔄 Streaming responses with progress indicators
+- 📝 Conversation history and context management
+
+## Running Your Code
+
+Each module can be run independently using the following commands:
 
 ### 01-basic
-
-The following command will execute your `index.ts` file:
-
 ```bash
 npm run start:01
 ```
 
 ### 02-voice
-
-The following command will start up the development server for your Next.js app:
-
 ```bash
 npm run start:02
+```
+
+### 03-hello
+```bash
+npm run start:03
+```
+
+### 04-agents
+```bash
+npm run start:04
+```
+
+### 05-agents-tools
+```bash
+npm run start:05
+```
+
+## Workshop Progression
+
+The workshop is designed to progressively build your understanding:
+
+1. **Start with 01-basic** to understand the core concepts of agents and tools
+2. **Move to 02-voice** to explore voice capabilities in a web environment
+3. **Try 03-hello** to learn about interactive chat and conversation management
+4. **Advance to 04-agents** to understand web search integration and streaming
+5. **Complete with 05-agents-tools** to see a full-featured multi-tool assistant
+
+## Environment Variables
+
+For the advanced modules (04-agents and 05-agents-tools), you'll need additional API keys:
+
+```env
+# Required for all modules
+OPENAI_API_KEY=your_openai_api_key_here
+
+# Required for 05-agents-tools weather functionality
+OPENWEATHER_API_KEY=your_openweather_api_key_here
 ```
 
 ## Resources
@@ -55,3 +121,5 @@ npm run start:02
 - [Agents SDK Examples](https://github.com/openai/openai-agents-js-internal/tree/main/examples)
 - [Details about Voice Agent Features](https://openai.github.io/openai-agents-js/guides/voice-agents/build/)
 - [Voice Agents Guide on the OpenAI Docs](https://platform.openai.com/docs/guides/voice-agents)
+- [OpenWeatherMap API](https://openweathermap.org/api) - For weather data
+- [Context7 MCP](https://context7.com) - For documentation access
